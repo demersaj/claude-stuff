@@ -10,6 +10,11 @@
       "name": "pm",
       "version": "1.0.0",
       "source": "./pm"
+    },
+    {
+      "name": "resume",
+      "version": "1.0.0",
+      "source": "./resume"
     }
   ]
 }
