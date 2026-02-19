@@ -9,6 +9,15 @@
         "installedAt": "2026-02-19T20:47:58.748Z",
         "lastUpdated": "2026-02-19T20:47:58.748Z"
       }
+    ],
+    "resume@local-desktop-app-uploads": [
+      {
+        "scope": "user",
+        "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/resume",
+        "version": "1.0.0",
+        "installedAt": "2026-02-19T00:00:00.000Z",
+        "lastUpdated": "2026-02-19T00:00:00.000Z"
+      }
     ]
   }
 }
