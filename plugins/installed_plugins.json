@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "plugins": {
+    "pm@local-desktop-app-uploads": [
+      {
+        "scope": "user",
+        "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/pm",
+        "version": "1.0.0",
+        "installedAt": "2026-02-19T20:47:58.748Z",
+        "lastUpdated": "2026-02-19T20:47:58.748Z"
+      }
+    ]
+  }
+}

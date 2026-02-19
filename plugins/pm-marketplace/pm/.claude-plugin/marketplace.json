@@ -1,0 +1,13 @@
+{
+    "name": "pm-marketplace",
+    "owner": {
+      "name": "Andrew DeMers"
+    },
+    "plugins": [
+      {
+        "name": "pm",
+        "source": "./pm",
+        "description": "Product management plugin for PRDs, specs, and planning"
+      }
+    ]
+  }

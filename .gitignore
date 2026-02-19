@@ -1,0 +1,25 @@
+# ignore all files in the directory
+/* 
+
+# except the following directories:
+!/skills/
+!/plugins/
+!/tools/
+!/prompts/
+!/scripts/
+!/references/
+!/examples/
+
+# except the following files:
+!/.gitignore
+!/README.md
+!/LICENSE
+!/CHANGELOG.md
+
+# embedded git repo (track separately or add as submodule if needed)
+plugins/marketplaces/claude-plugins-official
+
+# ignore env and DS_Store files
+.DS_Store
+.env
+.env.local

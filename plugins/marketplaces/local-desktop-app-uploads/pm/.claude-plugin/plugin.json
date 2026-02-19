@@ -1,0 +1,8 @@
+{
+  "name": "pm",
+  "version": "1.0.0",
+  "description": "Product management plugin for PRDs, technical specs, and strategic planning",
+  "commands": "../commands",
+  "skills": "../skills",
+  "agents": "../agents"
+}
