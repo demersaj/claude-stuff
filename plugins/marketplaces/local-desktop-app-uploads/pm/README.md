@@ -60,7 +60,3 @@ Copy this directory to `~/.claude/plugins/pm/`.
 # Format for Notion
 /pm:notion-format prd-real-time-collab.md
 ```
-
-## Customization
-
-Everything is markdown. Edit files directly in `~/.claude/plugins/pm/` to customize templates, review criteria, or agent personalities to match your team's norms.
