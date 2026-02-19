@@ -6,21 +6,43 @@ Personal [Claude](https://claude.ai) configuration and plugins, synced via Git s
 
 | Path | Description |
 |------|-------------|
-| **`plugins/`** | Installed plugins and marketplace config (e.g. PM plugin for PRDs). |
+| **`plugins/`** | Installed plugins and marketplace config. |
 | **`skills/`** | Custom agent skills (instructions the model can load for specific tasks). |
 | **`plugins/known_marketplaces.json`** | Registered plugin marketplaces (official + local). |
 
 Other folders like `tools/`, `prompts/`, `scripts/`, `references/`, and `examples/` are allowed by `.gitignore` so you can add them later if needed.
 
-## PM plugin
+## Plugins
 
-Includes a **product management** plugin for PRD writing and review:
+Two custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`:
+
+| Plugin | Path | Description |
+|--------|------|-------------|
+| **PM** | `pm/` | Product management: PRDs, technical specs, stories, review. |
+| **Resume** | `resume/` | Resume tailoring, cover letters, and improvement suggestions. |
+
+---
+
+### PM plugin
+
+Product management workflows for PRDs and planning:
 
 - **Commands:** `/pm:prd`, `/pm:review-prd`, `/pm:notes-to-prd`, `/pm:tech-spec`, `/pm:notion-format`, `/pm:stories`
 - **Skills:** PRD writing with Classic and OST templates
 - **Agents:** `@pm:prd-critic`, `@pm:eng-reader`
 
-Plugin files live under `plugins/marketplaces/local-desktop-app-uploads/pm/`. See that directory’s `README.md` for full usage.
+See `plugins/marketplaces/local-desktop-app-uploads/pm/README.md` for full usage.
+
+---
+
+### Resume plugin
+
+Resume and job-application workflows (tailored to Andrew Demers’ resume):
+
+- **Commands:** `/resume:tailor` (tailor resume to a job description), `/resume:improve`, `/resume:cover-letter`
+- **Skills:** `resume:resume-writer` — resume as source of truth for tailoring, cover letters, and section improvements
+
+Plugin files: `plugins/marketplaces/local-desktop-app-uploads/resume/`.
 
 ## Sync / setup
 
