@@ -15,6 +15,11 @@
       "name": "resume",
       "version": "1.0.0",
       "source": "./resume"
+    },
+    {
+      "name": "webai",
+      "version": "1.0.0",
+      "source": "./webai"
     }
   ]
 }

@@ -28,15 +28,6 @@ A Claude Code plugin for product management workflows, focused on PRD writing an
 
 ## Installation
 
-### From GitHub (recommended)
-
-```bash
-/plugin marketplace add https://github.com/YOUR_USERNAME/pm-plugin
-/plugin install pm
-```
-
-### Local
-
 Copy this directory to `~/.claude/plugins/pm/`.
 
 ## Usage
