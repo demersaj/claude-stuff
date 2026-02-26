@@ -6,7 +6,10 @@ A Claude Code plugin that provides a developer persona: takes a PRD or implement
 
 | Command | Description |
 |---------|-------------|
-| `/dev:dev` | Take a PRD or instructions, plan the implementation, and build it |
+| `/dev:dev` | Full workflow — understand, plan, and execute |
+| `/dev:understand` | Orient in the codebase — map subsystems, patterns, constraints |
+| `/dev:plan` | Write an implementation plan saved to `plans/` |
+| `/dev:execute` | Execute a plan — dispatch agents, verify, commit |
 
 ## Skills
 
