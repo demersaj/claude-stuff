@@ -18,6 +18,24 @@
         "installedAt": "2026-02-19T00:00:00.000Z",
         "lastUpdated": "2026-02-19T00:00:00.000Z"
       }
+    ],
+    "webai@local-desktop-app-uploads": [
+      {
+        "scope": "user",
+        "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/webai",
+        "version": "1.0.0",
+        "installedAt": "2026-02-24T23:15:32.675Z",
+        "lastUpdated": "2026-02-24T23:15:32.675Z"
+      }
+    ],
+    "dev@local-desktop-app-uploads": [
+      {
+        "scope": "user",
+        "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/dev",
+        "version": "1.0.0",
+        "installedAt": "2026-02-26T00:00:00.000Z",
+        "lastUpdated": "2026-02-26T00:00:00.000Z"
+      }
     ]
   }
 }

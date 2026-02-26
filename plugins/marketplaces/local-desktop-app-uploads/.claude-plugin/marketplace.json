@@ -20,6 +20,11 @@
       "name": "webai",
       "version": "1.0.0",
       "source": "./webai"
+    },
+    {
+      "name": "dev",
+      "version": "1.0.0",
+      "source": "./dev"
     }
   ]
 }
