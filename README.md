@@ -14,12 +14,14 @@ Other folders like `tools/`, `prompts/`, `scripts/`, `references/`, and `example
 
 ## Plugins
 
-Two custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`:
+Four custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`:
 
 | Plugin | Path | Description |
 |--------|------|-------------|
 | **PM** | `pm/` | Product management: PRDs, technical specs, stories, review. |
 | **Resume** | `resume/` | Resume tailoring, cover letters, and improvement suggestions. |
+| **webai** | `webai/` | Build and deploy React/Vue apps to the webAI Apogee shell. |
+| **Dev** | `dev/` | Developer persona: understand codebase, plan, and execute. |
 
 ---
 
@@ -28,7 +30,7 @@ Two custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`:
 Product management workflows for PRDs and planning:
 
 - **Commands:** `/pm:prd`, `/pm:review-prd`, `/pm:notes-to-prd`, `/pm:tech-spec`, `/pm:notion-format`, `/pm:stories`
-- **Skills:** PRD writing with Classic and OST templates
+- **Skills:** `pm:prd-writing` — PRD writing with Classic and OST templates
 - **Agents:** `@pm:prd-critic`, `@pm:eng-reader`
 
 See `plugins/marketplaces/local-desktop-app-uploads/pm/README.md` for full usage.
@@ -39,10 +41,32 @@ See `plugins/marketplaces/local-desktop-app-uploads/pm/README.md` for full usage
 
 Resume and job-application workflows (tailored to Andrew Demers’ resume):
 
-- **Commands:** `/resume:tailor` (tailor resume to a job description), `/resume:improve`, `/resume:cover-letter`
+- **Commands:** `/resume:tailor`, `/resume:improve`, `/resume:cover-letter`
 - **Skills:** `resume:resume-writer` — resume as source of truth for tailoring, cover letters, and section improvements
 
 Plugin files: `plugins/marketplaces/local-desktop-app-uploads/resume/`.
+
+---
+
+### webai plugin
+
+Build and deploy React or Vue apps to the webAI Apogee shell:
+
+- **Commands:** `/webai:new-app`, `/webai:build-upload`, `/webai:add-oasis`, `/webai:add-collab`
+- **Skills:** `build-upload`, `webai-app`, `new-app`, `add-oasis`, `add-collab`
+
+See `plugins/marketplaces/local-desktop-app-uploads/webai/README.md` for full usage.
+
+---
+
+### Dev plugin
+
+Developer persona: takes a PRD or instructions, understands the codebase, plans, and executes:
+
+- **Commands:** `/dev:dev`
+- **Skills:** `dev:dev` (full workflow), `dev:understand`, `dev:plan`, `dev:execute`
+
+See `plugins/marketplaces/local-desktop-app-uploads/dev/README.md` for full usage.
 
 ## Sync / setup
 
