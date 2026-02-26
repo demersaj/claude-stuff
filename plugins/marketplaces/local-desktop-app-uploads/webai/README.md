@@ -11,6 +11,18 @@ Build and deploy React or Vue apps to the webAI Apogee shell.
 | `/webai:add-oasis [file]` | Add OasisHost AI inference wiring to a component |
 | `/webai:add-collab [file]` | Add CollaborationManager P2P wiring to a component |
 
+## Skills
+
+Agent skills (auto-triggered in Cursor/Claude Code when relevant):
+
+| Skill | Triggers on | What it does |
+|-------|-------------|---------------|
+| **build-upload** | Build, upload, deploy webAI app | Build to single HTML, install directly into running Apogee Tauri shell (or fallback paste script) |
+| **webai-app** | webAI, Apogee, shell app | Reference for architecture, APIs, OasisHost, navigation, collaboration |
+| **new-app** | Scaffold, new app, webAI app | Scaffold React or Vue app wired to Apogee shell |
+| **add-oasis** | OasisHost, AI inference | Add OasisHost AI wiring to a component |
+| **add-collab** | CollaborationManager, P2P, collab | Add CollaborationManager (rooms, CRDT, chat) wiring to a component |
+
 ## Installation
 
 ### Local (recommended for development)
@@ -44,8 +56,8 @@ cd my-tool
 # 3. Build and upload
 /webai:build-upload
 
-# 4. Paste the generated script into the Apogee browser console
-# 5. Refresh the launcher - your app appears
+# 4. If Apogee Tauri app is running: app installs directly — refresh the launcher.
+#    If not: paste the generated script into the Apogee browser console, then refresh.
 ```
 
 ## How uploads work

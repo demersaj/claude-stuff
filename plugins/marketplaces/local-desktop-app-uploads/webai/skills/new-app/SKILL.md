@@ -1,7 +1,7 @@
 ---
 name: new-app
 description: Scaffold a new React or Vue app for the webAI Apogee shell
-argument-hint: "<app-name> [react|vue]"
+argument-hint: "<app-name> [react|vue] [--description \"What this app does\"]"
 allowed-tools: Bash, Read, Write, Glob
 ---
 
@@ -11,7 +11,7 @@ Scaffold a new app for the webAI Apogee shell.
 
 ## Process
 
-1. **Parse arguments** - Get app name and framework from the user's input (e.g. `/webai:new-app my-tool react`). If framework is not specified, ask the user to choose between React and Vue.
+1. **Parse arguments** - Get app name, framework, and optional description from the user's input (e.g. `/webai:new-app my-tool react --description "A kanban board with AI task suggestions"`). If framework is not specified, ask the user to choose between React and Vue. If `--description` is provided, capture it for use in steps 5 and 8.
 
 2. **Read the webai-app skill** to understand the constraints and APIs before generating any code.
 
@@ -155,12 +155,15 @@ Scaffold a new app for the webAI Apogee shell.
    }
    ```
 
-8. **Replace boilerplate** in `src/App.jsx` (React) or `src/App.vue` (Vue) with a minimal webAI-ready starter that:
+   Also set `"description"` in `package.json` to the value provided via `--description` (or a sensible default derived from the app name if none was given). This is picked up automatically by the build-upload skill.
+
+8. **Replace boilerplate** in `src/App.jsx` (React) or `src/App.vue` (Vue) with a webAI-ready starter that:
    - Imports from `./webai.js`
    - Polls `getOasisState()` every 1.2s and shows AI status in the header
    - Has a back-to-launcher button
-   - Includes a placeholder main content area
    - Shows a "Not running in Apogee" notice in dev mode (when shell APIs are null)
+   - **If `--description` was provided**: generate a meaningful initial UI and logic that reflects what the app is supposed to do — real components, real state, real layout — not a generic placeholder. Use the description to inform the component structure, copy, and any AI prompts passed to `streamCompletion`.
+   - **If no description**: use a minimal placeholder main content area.
 
 9. **Print next steps** for the user:
    ```
@@ -170,14 +173,9 @@ Scaffold a new app for the webAI Apogee shell.
      cd <app-name>
      npm run dev          # local dev server
      npm run build        # build single-file HTML
-     npm run upload       # generate upload script
 
-   When ready to upload:
-     1. npm run build
-     2. npm run upload   (outputs a browser console script)
-     3. Open your Apogee shell in the browser
-     4. Paste the script into DevTools console
-     5. Refresh the launcher - your app will appear
+   When ready to upload to Apogee:
+     /webai:build-upload
    ```
 
 ## Rules
@@ -185,5 +183,6 @@ Scaffold a new app for the webAI Apogee shell.
 - Always use `vite-plugin-singlefile` - this is non-negotiable for Apogee compatibility.
 - Always create `src/webai.js` as the integration layer.
 - Never hardcode app IDs - derive from `package.json` name.
-- The upload method is via `localStorage` key `apogee-uploaded-apps` - do not use any other method.
+- Always set `"description"` in `package.json` — use the `--description` value if provided, otherwise derive a short description from the app name.
+- When a description is provided, generate a real starting UI that reflects it — not a generic placeholder. The goal is that the user can immediately run the app and see something meaningful.
 - In dev mode, gracefully handle null shell APIs (the app runs outside the iframe during development).
