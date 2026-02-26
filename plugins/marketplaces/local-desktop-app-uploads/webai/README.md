@@ -6,8 +6,8 @@ Build and deploy React or Vue apps to the webAI Apogee shell.
 
 | Command | What it does |
 |---------|-------------|
-| `/webai:new-app <name> [react\|vue]` | Scaffold a new Vite app wired to Apogee shell APIs |
-| `/webai:build-upload` | Build to a single HTML file and generate the upload script |
+| `/webai:new-app <name> [react\|vue] [--description "..."]` | Scaffold a new Vite app wired to Apogee shell APIs |
+| `/webai:build-upload [--open]` | Build to single HTML, install into running Apogee Tauri shell (or paste script) |
 | `/webai:add-oasis [file]` | Add OasisHost AI inference wiring to a component |
 | `/webai:add-collab [file]` | Add CollaborationManager P2P wiring to a component |
 
@@ -15,13 +15,13 @@ Build and deploy React or Vue apps to the webAI Apogee shell.
 
 Agent skills (auto-triggered in Cursor/Claude Code when relevant):
 
-| Skill | Triggers on | What it does |
-|-------|-------------|---------------|
-| **build-upload** | Build, upload, deploy webAI app | Build to single HTML, install directly into running Apogee Tauri shell (or fallback paste script) |
-| **webai-app** | webAI, Apogee, shell app | Reference for architecture, APIs, OasisHost, navigation, collaboration |
-| **new-app** | Scaffold, new app, webAI app | Scaffold React or Vue app wired to Apogee shell |
-| **add-oasis** | OasisHost, AI inference | Add OasisHost AI wiring to a component |
-| **add-collab** | CollaborationManager, P2P, collab | Add CollaborationManager (rooms, CRDT, chat) wiring to a component |
+| Skill | What it does |
+|-------|---------------|
+| **build-upload** | Build the current webAI app to a single HTML file and upload it directly to the running Apogee Tauri shell |
+| **webai-app** | webAI Apogee shell app architecture and APIs. Reference for building single-file React/Vue apps with OasisHost AI, navigation, collaboration, and identity APIs |
+| **new-app** | Scaffold a new React or Vue app for the webAI Apogee shell |
+| **add-oasis** | Add OasisHost AI inference wiring to an existing webAI app |
+| **add-collab** | Add CollaborationManager (P2P rooms, CRDT, chat) wiring to an existing webAI app |
 
 ## Installation
 
