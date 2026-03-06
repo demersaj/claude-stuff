@@ -17,21 +17,21 @@
 ### Technical Product Manager, AI Applications | webAI  
 *03/2024 – 02/2026*
 
-- Increased platform adoption by 20% by delivering 30+ AI-driven features across an end-to-end machine learning platform for rapid model prototyping and deployment.
-- Led the successful launch of the company's first iOS AI application by defining product strategy for privacy-centric, on-device LLM inference.
+- Increased platform adoption by 20% by delivering 50+ AI-driven features across an end-to-end machine learning platform for rapid model prototyping and deployment.
+- Launched the company's first iOS AI application - defining product strategy for privacy-centric, on-device LLM inference and establishing the foundation for the mobile AI product line.
 - Accelerated ML release cycles by translating customer insights and market research into a unified AI roadmap and prioritized backlog while partnering cross-functionally with Engineering, Design, and Marketing.
 
 ### Software Project Manager | Apptronik  
 *06/2023 – 02/2024*
 
-- Delivered AI/ML capabilities for autonomous robotic systems by serving as the primary liaison between external partners and engineering teams.
-- Improved roadmap clarity and dependency management by creating feature epics, technical requirements, and user stories for AI-enabled platforms.
+- Shipped AI/ML capabilities for autonomous robotic systems by translating external partner requirements into engineering-ready specifications - acting as the single technical point of contact across both organizations.
+- Reduced cross-team dependency risk by authoring feature epics, technical requirements, and user stories that gave engineering a clear, prioritized path forward on AI-enabled platforms.
 
 ### Associate Product Manager, Computer Vision | Flash  
 *07/2022 – 04/2023*
 
-- Expanded adoption of AI-powered features by partnering with Engineering, Analytics, and Sales to execute the product roadmap.
-- Strengthened product-market fit by incorporating customer insights and performance data into continuous AI model iteration cycles.
+- Drove adoption of AI-powered features by aligning Engineering, Analytics, and Sales around a unified product roadmap and shared success metrics.
+- Tightened product-market fit by building structured AI model iteration cycles - systematically incorporating customer feedback and live performance data to improve feature adoption across each release.
 
 ---
 

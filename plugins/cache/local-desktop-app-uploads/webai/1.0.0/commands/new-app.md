@@ -1,40 +1,33 @@
 ---
-description: Scaffold and generate a new React or Vue app for the webAI Apogee shell from a description
-argument-hint: "<app-name> \"<description>\" [react|vue]"
+description: Scaffold a new React or Vue app for the webAI Apogee shell
+argument-hint: "<app-name> [react|vue]"
 allowed-tools: Bash, Read, Write, Glob
 ---
 
 # webAI New App
 
-Scaffold and generate a new app for the webAI Apogee shell based on a description.
+Scaffold a new app for the webAI Apogee shell.
 
 ## Process
 
-1. **Parse arguments** from the user's input:
-   - `app-name` — kebab-case identifier (e.g. `word-counter`)
-   - `description` — what the app should do (e.g. `"a word and character counter with live stats"`)
-   - `framework` — `react` or `vue` (optional; ask if not provided)
+1. **Parse arguments** - Get app name and framework from the user's input (e.g. `/webai:new-app my-tool react`). If framework is not specified, ask the user to choose between React and Vue.
 
-   Example: `/webai:new-app word-counter "a word and character counter with live stats" react`
+2. **Read the webai-app skill** to understand the constraints and APIs before generating any code.
 
-   If description is not provided, ask the user what the app should do before proceeding.
-
-2. **Read the webai-app skill** to understand the shell APIs, constraints, and globals before writing any code.
-
-3. **Scaffold the project** inside the `apps/` directory at the repo root:
+3. **Scaffold the project**:
 
    **For React:**
    ```bash
-   npm create vite@latest apps/<app-name> -- --template react
-   cd apps/<app-name>
+   npm create vite@latest <app-name> -- --template react
+   cd <app-name>
    npm install
    npm install --save-dev vite-plugin-singlefile
    ```
 
    **For Vue:**
    ```bash
-   npm create vite@latest apps/<app-name> -- --template vue
-   cd apps/<app-name>
+   npm create vite@latest <app-name> -- --template vue
+   cd <app-name>
    npm install
    npm install --save-dev vite-plugin-singlefile
    ```
@@ -51,16 +44,7 @@ Scaffold and generate a new app for the webAI Apogee shell based on a descriptio
    });
    ```
 
-5. **Set `description` in `package.json`** to a short display name derived from the user's description — this is what appears in the Apogee launcher:
-   ```json
-   {
-     "name": "<app-name>",
-     "description": "<Display Name>",
-     ...
-   }
-   ```
-
-6. **Create `src/webai.js`** — shell API helpers (copy verbatim):
+5. **Create `src/webai.js`** - shell API helpers:
    ```javascript
    // src/webai.js - webAI shell integration helpers
    export const getShellAPI = (name) =>
@@ -107,56 +91,98 @@ Scaffold and generate a new app for the webAI Apogee shell based on a descriptio
    }
    ```
 
-7. **Add npm scripts** to `package.json` — the `upload` script points to `scripts/upload.js` at the repo root (two levels up from `apps/<app-name>/`):
+6. **Create `scripts/upload.js`** - upload helper:
+   ```javascript
+   #!/usr/bin/env node
+   // scripts/upload.js
+   // Run: node scripts/upload.js
+   // Then paste the output into the browser console on your Apogee shell page.
+   import { readFileSync } from 'fs';
+   import { resolve } from 'path';
+
+   const htmlPath = resolve('./dist/index.html');
+   let html;
+   try {
+     html = readFileSync(htmlPath, 'utf8');
+   } catch {
+     console.error('dist/index.html not found. Run `npm run build` first.');
+     process.exit(1);
+   }
+
+   // Read app metadata from package.json
+   const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
+   const appId = pkg.name;
+   const displayName = pkg.description || pkg.name;
+
+   const uploadScript = `
+   (async function uploadToApogee() {
+     const htmlContent = ${JSON.stringify(html)};
+     const appId = ${JSON.stringify(appId)};
+     const displayName = ${JSON.stringify(displayName)};
+
+     const hashBuffer = await crypto.subtle.digest(
+       'SHA-256',
+       new TextEncoder().encode(htmlContent.replace(/\\s+/g, ' ').replace(/<!--[\\s\\S]*?-->/g, ''))
+     );
+     const sourceId = Array.from(new Uint8Array(hashBuffer))
+       .map(b => b.toString(16).padStart(2, '0')).join('');
+
+     const stored = JSON.parse(localStorage.getItem('apogee-uploaded-apps') || '[]');
+     const filtered = stored.filter(app => app.appId !== appId);
+     filtered.push({ appId, displayName, htmlContent, sourceId, uploadedAt: Date.now(), version: 1 });
+     localStorage.setItem('apogee-uploaded-apps', JSON.stringify(filtered));
+
+     console.log('[webAI] Uploaded: ' + displayName + ' (' + appId + ')');
+     console.log('[webAI] Refresh the Apogee launcher to see your app.');
+   })();
+   `.trim();
+
+   console.log('=== Paste this in your browser console on the Apogee shell page ===\n');
+   console.log(uploadScript);
+   console.log('\n=== End of script ===');
+   ```
+
+7. **Add npm scripts** to `package.json`:
    ```json
    {
      "scripts": {
        "dev": "vite",
        "build": "vite build",
        "preview": "vite preview",
-       "upload": "node ../../scripts/upload.js"
+       "upload": "node scripts/upload.js"
      }
    }
    ```
 
-8. **Generate the app** — replace the boilerplate `src/App.jsx` (React) or `src/App.vue` (Vue) with a **fully functional implementation** based on the description. This is the main creative step.
+8. **Replace boilerplate** in `src/App.jsx` (React) or `src/App.vue` (Vue) with a minimal webAI-ready starter that:
+   - Imports from `./webai.js`
+   - Polls `getOasisState()` every 1.2s and shows AI status in the header
+   - Has a back-to-launcher button
+   - Includes a placeholder main content area
+   - Shows a "Not running in Apogee" notice in dev mode (when shell APIs are null)
 
-   Design principles:
-   - Build the complete, working app described — not a placeholder or skeleton
-   - Import `goToLauncher`, `getOasisState`, `streamCompletion` etc. from `./webai.js` as needed
-   - Include an AI status indicator in the header only if the app uses AI (poll `getOasisState()` every 1.2s)
-   - Always include a back-to-launcher button (call `goToLauncher()`)
-   - Show a subtle "⚠ Not running in Apogee shell" banner when `getApogeeShell()` returns null (dev mode)
-   - Use clean, modern inline styles — no external CSS dependencies
-   - Keep the component tree flat and simple; this is a single-page tool
-
-   If the description implies AI features (chat, summarize, generate, explain, etc.):
-   - Use `streamCompletion()` from `./webai.js`
-   - Show loading/streaming state while AI is generating
-   - Handle the case where OasisHost is null (dev mode) with a clear notice
-
-9. **Print next steps**:
+9. **Print next steps** for the user:
    ```
-   ✅ Created <display-name> in apps/<app-name>/
+   ✅ Scaffolded <app-name> (<framework>)
 
    Next steps:
-     cd apps/<app-name>
+     cd <app-name>
      npm run dev          # local dev server
      npm run build        # build single-file HTML
-     npm run upload       # install directly into running Apogee
-
-   Upload behaviour:
-     • Apogee running → installed instantly, refresh the launcher
-     • Apogee not running → prints a DevTools console paste script
+     npm run upload       # generate upload script
+   
+   When ready to upload:
+     1. npm run build
+     2. npm run upload   (outputs a browser console script)
+     3. Open your Apogee shell in the browser
+     4. Paste the script into DevTools console
+     5. Refresh the launcher - your app will appear
    ```
 
 ## Rules
 
-- **Always generate a real, functional app** — never produce a placeholder or "coming soon" stub.
-- Always use `vite-plugin-singlefile` — non-negotiable for Apogee compatibility.
-- Always create `src/webai.js` verbatim as the integration layer.
-- Set `package.json` `description` to a clean display name derived from the user's description.
-- Never hardcode app IDs — always derive from `package.json` `name`.
-- Always scaffold inside `apps/` so `../../scripts/upload.js` resolves to the repo-root upload script.
-- Never create a per-app copy of `upload.js`.
-- In dev mode, gracefully handle null shell APIs with a visible notice.
+- Always use `vite-plugin-singlefile` - this is non-negotiable for Apogee compatibility.
+- Always create `src/webai.js` as the integration layer.
+- Never hardcode app IDs - derive from `package.json` name.
+- The upload method is via `localStorage` key `apogee-uploaded-apps` - do not use any other method.
+- In dev mode, gracefully handle null shell APIs (the app runs outside the iframe during development).

@@ -5,7 +5,7 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/huxley-47/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-02-26T19:10:25.096Z"
+    "lastUpdated": "2026-03-02T16:37:20.732Z"
   },
   "local-desktop-app-uploads": {
     "source": {
@@ -13,7 +13,7 @@
       "path": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads"
     },
     "installLocation": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads",
-    "lastUpdated": "2026-02-25T00:43:20.186Z",
+    "lastUpdated": "2026-02-27T14:56:28.833Z",
     "autoUpdate": true
   }
 }

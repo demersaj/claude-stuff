@@ -47,7 +47,7 @@ Or from inside Claude Code:
 
 ```bash
 # 1. Scaffold a new app
-/webai:new-app my-tool react
+/webai:new-app my-tool tool-desciption react 
 
 # 2. Build your app in Claude Code (or manually)
 cd my-tool

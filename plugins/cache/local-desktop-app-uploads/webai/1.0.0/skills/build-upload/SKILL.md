@@ -21,7 +21,7 @@ Build the current app and install it directly into the running Apogee shell.
    ```
    If the build fails, show the error and stop.
 
-4. **Verify output** — check that `dist/index.html` exists and is a self-contained file (no external script/link tags pointing to relative paths).
+4. **Verify output** - check that `dist/index.html` exists and is a self-contained file (no external script/link tags pointing to relative paths).
 
 5. **Run the upload script:**
    ```bash
@@ -32,17 +32,17 @@ Build the current app and install it directly into the running Apogee shell.
    - The Tauri server calls `window.ApogeeShell.uploadApp()` in the running shell webview directly
    - If the Tauri app isn't running, the script automatically falls back to printing a DevTools paste script
 
-   If `scripts/upload.js` is missing (the repo root scripts dir), tell the user it should be at `<repo-root>/scripts/upload.js` and was added alongside the Tauri install server — they may need to pull latest.
+   If `scripts/upload.js` is missing, tell the user it should be at `<repo-root>/scripts/upload.js` — it was added alongside the Tauri install server and they may need to pull latest.
 
 6. **Report the outcome clearly:**
 
-   When Tauri app is running (direct install path):
+   When Tauri app is running (direct install):
    ```
    ✅ Build complete: dist/index.html (<size> KB)
    ✅ "<display-name>" installed directly into Apogee — refresh the launcher.
    ```
 
-   When Tauri app is not running (fallback paste path):
+   When Tauri app is not running (fallback paste):
    ```
    ✅ Build complete: dist/index.html (<size> KB)
    ⚠️  Tauri app not running — paste the script printed above into:
@@ -53,7 +53,7 @@ Build the current app and install it directly into the running Apogee shell.
 
 ## Rules
 
-- Do not modify the HTML output after build — the upload script uses it verbatim.
+- Do not modify the HTML output after build - the upload script uses it verbatim.
 - Always show file size of the built HTML so the user knows if it's getting large.
-- If `dist/index.html` is larger than 5 MB, warn the user — large apps may have performance issues in Apogee.
+- If `dist/index.html` is larger than 5 MB, warn the user - large apps may have performance issues in Apogee.
 - The `scripts/upload.js` path is relative to the repo root, not the app directory. Apps live in `apps/<name>/` so the path from there is `../../scripts/upload.js`.
