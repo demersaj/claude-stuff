@@ -22,9 +22,7 @@ You can also invoke it explicitly with the command below.
 
 | Command | Description |
 |---------|-------------|
-| `/student` | Turn on student (tutor) mode — Socratic hints, no direct answers |
-
-Use `/student` or `/student:student` depending on how your client lists commands.
+| `/student:tutor` | Turn on tutor mode — Socratic hints, no direct answers |
 
 ## Behavior
 
