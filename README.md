@@ -78,7 +78,7 @@ Socratic learning assistant for homework, coursework, and debugging — guides t
 - **Commands:** `/student:tutor`
 - **Skills:** `student:student-assistant` — tutor persona, Python default, no direct answers unless asked
 
-See `plugins/marketplaces/local-desktop-app-uploads/student-assistant/README.md` for full usage. Also available as a Cursor skill at `~/.cursor/skills/student-assistant/SKILL.md`.
+See `plugins/marketplaces/local-desktop-app-uploads/student-assistant/README.md` for full usage.
 
 ## Sync / setup
 
