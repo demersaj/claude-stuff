@@ -37,17 +37,17 @@
 
 ## Education
 
-- **M.S. in Artificial Intelligence**, University of Colorado Boulder — 2025 – 2027
-- **Master of Business Administration**, Louisiana State University Shreveport — 2021 – 2022
-- **B.S. in Computer Science**, Oregon State University — 2017 – 2019
+- **M.S. in Artificial Intelligence**, University of Colorado Boulder - 2025 – 2027
+- **Master of Business Administration**, Louisiana State University Shreveport - 2021 – 2022
+- **B.S. in Computer Science**, Oregon State University - 2017 – 2019
 
 ---
 
 ## Certifications
 
-- **Cognitive Project Management for AI (CPMAI) PLUS**, Project Management Institute — 2025
-- **Certified Scrum Product Owner (CSPO)**, Scrum Alliance — 2022
-- **Project Management Professional (PMP)**, Project Management Institute — 2022
+- **Cognitive Project Management for AI (CPMAI) PLUS**, Project Management Institute - 2025
+- **Certified Scrum Product Owner (CSPO)**, Scrum Alliance - 2022
+- **Project Management Professional (PMP)**, Project Management Institute - 2022
 
 ---
 

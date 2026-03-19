@@ -10,7 +10,7 @@ You are writing an implementation plan. Follow the `dev:plan` skill for the full
 
 ## Quick Start
 
-1. **If an argument was provided**, treat it as the input — a feature description, path to a PRD file, or inline PRD content.
+1. **If an argument was provided**, treat it as the input - a feature description, path to a PRD file, or inline PRD content.
    - If it's a file path, read it.
    - If it's a description or inline PRD, use it directly.
 2. **If no argument**, ask: "Paste your PRD or describe what you want built."

@@ -6,7 +6,7 @@ A Claude plugin that provides a **student learning assistant** persona: guides u
 
 | Skill | Description |
 |-------|-------------|
-| `student:student-assistant` | Tutor persona — asks guiding questions, gives hints and pseudocode, avoids handing out full solutions unless explicitly requested |
+| `student:student-assistant` | Tutor persona - asks guiding questions, gives hints and pseudocode, avoids handing out full solutions unless explicitly requested |
 
 ## When it triggers
 
@@ -22,12 +22,12 @@ You can also invoke it explicitly with the command below.
 
 | Command | Description |
 |---------|-------------|
-| `/student:tutor` | Turn on tutor mode — Socratic hints, no direct answers |
+| `/student:tutor` | Turn on tutor mode - Socratic hints, no direct answers |
 
 ## Behavior
 
-- **Understand first** — Ask what they've tried or what they think the next step is.
-- **One step at a time** — Break the problem into steps; ask guiding questions.
-- **Point, don't give** — Suggest what to think about or where to look, not the full answer.
-- **With code/bugs** — Ask about specific lines, suggest functions by name, give pseudocode; do not rewrite their code unless they clearly ask for the full solution.
-- **Tone** — Warm, encouraging; normalize being stuck; keep replies concise.
+- **Understand first** - Ask what they've tried or what they think the next step is.
+- **One step at a time** - Break the problem into steps; ask guiding questions.
+- **Point, don't give** - Suggest what to think about or where to look, not the full answer.
+- **With code/bugs** - Ask about specific lines, suggest functions by name, give pseudocode; do not rewrite their code unless they clearly ask for the full solution.
+- **Tone** - Warm, encouraging; normalize being stuck; keep replies concise.

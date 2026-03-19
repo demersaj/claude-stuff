@@ -4,9 +4,9 @@ description: Implementation planning skill for development work. Use this skill 
 version: 1.0.0
 ---
 
-# Plan — Implementation Planning
+# Plan - Implementation Planning
 
-Write a structured implementation plan before touching any code. The plan is the contract between understanding and execution — it should be specific enough that a sub-agent can execute a task group without asking questions.
+Write a structured implementation plan before touching any code. The plan is the contract between understanding and execution - it should be specific enough that a sub-agent can execute a task group without asking questions.
 
 ---
 
@@ -27,31 +27,31 @@ Status: IN PROGRESS
 - <explicit list>
 
 **Out of scope:**
-- <explicit list — things that might seem related but aren't being done now>
+- <explicit list - things that might seem related but aren't being done now>
 
 ## Success criteria
-1. <Observable outcome — something you can verify with a command or by looking at the UI>
+1. <Observable outcome - something you can verify with a command or by looking at the UI>
 2. <Another observable outcome>
 3. <...>
 
 ## Context to load
 Before starting, read:
-- `path/to/relevant/file.ts` — <why>
-- `path/to/other/file.ts` — <why>
+- `path/to/relevant/file.ts` - <why>
+- `path/to/other/file.ts` - <why>
 
 ## Tasks
 
-### Group A — <subsystem name>  [parallel with Group B]
+### Group A - <subsystem name>  [parallel with Group B]
 - [ ] Task 1: <imperative verb> `path/to/file.ts`
   verify: `<shell command>` or <observable check>
 - [ ] Task 2: <imperative verb> `path/to/file.ts`
   verify: `<shell command>` or <observable check>
 
-### Group B — <subsystem name>  [parallel with Group A]
+### Group B - <subsystem name>  [parallel with Group A]
 - [ ] Task 3: <imperative verb> `path/to/file.ts`
   verify: `<shell command>` or <observable check>
 
-### Group C — <subsystem name>  [depends on A and B]
+### Group C - <subsystem name>  [depends on A and B]
 - [ ] Task 4: <imperative verb> `path/to/file.ts`
   verify: `<shell command>` or <observable check>
 ```
@@ -64,8 +64,8 @@ Before starting, read:
 
 | Wrong | Right |
 |-------|-------|
-| Group: "all TypeScript types" | Group: "auth module — types, hooks, tests" |
-| Group: "all test files" | Group: "billing module — component, store slice, tests" |
+| Group: "all TypeScript types" | Group: "auth module - types, hooks, tests" |
+| Group: "all test files" | Group: "billing module - component, store slice, tests" |
 
 **Parallelise across subsystems.** Groups that touch different directories run simultaneously.
 
@@ -78,9 +78,9 @@ Before starting, read:
 ## Task rules
 
 Every task must have:
-1. **An imperative action** — "Add", "Update", "Refactor", "Delete", "Wire up"
-2. **An explicit file path** — never "the auth module" or "the relevant file"
-3. **A verify step** — a shell command, a curl, a test filter, or a specific observable check
+1. **An imperative action** - "Add", "Update", "Refactor", "Delete", "Wire up"
+2. **An explicit file path** - never "the auth module" or "the relevant file"
+3. **A verify step** - a shell command, a curl, a test filter, or a specific observable check
 
 Never write a verify step that says "check that it works" or "confirm the feature is functional". Be specific:
 - `yarn test --testPathPattern=auth`

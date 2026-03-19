@@ -4,13 +4,13 @@ description: Codebase understanding phase for development work. Use this skill b
 version: 1.0.0
 ---
 
-# Understand — Codebase Orientation
+# Understand - Codebase Orientation
 
-Ground yourself in the codebase before touching anything. The goal is to understand what exists, how it's structured, and what patterns to follow — so that everything written afterward is native to the codebase, not bolted on.
+Ground yourself in the codebase before touching anything. The goal is to understand what exists, how it's structured, and what patterns to follow - so that everything written afterward is native to the codebase, not bolted on.
 
 ---
 
-## Step 1 — Project instructions
+## Step 1 - Project instructions
 
 Read `CLAUDE.md` (or `.claude/CLAUDE.md`) if it exists. This is the authoritative source for:
 - Build and test commands
@@ -22,14 +22,14 @@ If multiple `CLAUDE.md` files exist (root + subdirectory), read both. The subdir
 
 ---
 
-## Step 2 — Identify affected subsystems
+## Step 2 - Identify affected subsystems
 
 From the PRD, feature spec, or task description, identify:
 - Which directories and files will need to change
 - Which modules they depend on
 - Which modules depend on them (downstream impact)
 
-Use `Glob` and `Grep` to find relevant files. Don't guess file locations — confirm them.
+Use `Glob` and `Grep` to find relevant files. Don't guess file locations - confirm them.
 
 ```
 Glob: src/**/*.ts filtered by the feature name or related keywords
@@ -38,7 +38,7 @@ Grep: for existing usage of the interface, hook, or API being modified
 
 ---
 
-## Step 3 — Read key files
+## Step 3 - Read key files
 
 For each affected subsystem, read enough to understand:
 
@@ -55,7 +55,7 @@ Do not skim. Read the actual code. Patterns that aren't obvious from file names 
 
 ---
 
-## Step 4 — Map dependencies
+## Step 4 - Map dependencies
 
 Before planning any changes, understand:
 - What does the affected code import from?
@@ -67,18 +67,18 @@ Use `Grep` to find all imports of the relevant modules.
 
 ---
 
-## Step 5 — Note constraints and conventions
+## Step 5 - Note constraints and conventions
 
 Record anything that will constrain implementation:
 
-- **Forbidden patterns** — things the codebase explicitly avoids (e.g. no `any`, no `useEffect` for data fetching, no `git add -A`)
-- **Required patterns** — things that must be used (e.g. `useAppDispatch`, `RTK Query`, `RunE` in cobra commands)
-- **Test conventions** — what test utilities exist, what query priorities are used, what gets mocked
-- **Build constraints** — anything that affects how the output is structured
+- **Forbidden patterns** - things the codebase explicitly avoids (e.g. no `any`, no `useEffect` for data fetching, no `git add -A`)
+- **Required patterns** - things that must be used (e.g. `useAppDispatch`, `RTK Query`, `RunE` in cobra commands)
+- **Test conventions** - what test utilities exist, what query priorities are used, what gets mocked
+- **Build constraints** - anything that affects how the output is structured
 
 ---
 
-## Step 6 — Clarify blocking ambiguities
+## Step 6 - Clarify blocking ambiguities
 
 After reading the codebase, surface only the questions that would meaningfully change the implementation approach. Avoid asking about things inferable from the code or PRD.
 

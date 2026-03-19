@@ -1,5 +1,5 @@
 ---
-description: Execute an implementation plan — orchestrate sub-agents to implement, verify, and commit
+description: Execute an implementation plan - orchestrate sub-agents to implement, verify, and commit
 argument-hint: "[plan-file]"
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---

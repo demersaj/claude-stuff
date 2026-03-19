@@ -1,6 +1,6 @@
 # Resume Writer Plugin for Claude Code
 
-A Claude Code plugin for Andrew Demers' resume — tailoring, cover letters, and improvement suggestions.
+A Claude Code plugin for Andrew Demers' resume - tailoring, cover letters, and improvement suggestions.
 
 ## Commands
 

@@ -1,5 +1,5 @@
 ---
-description: Socratic tutoring — hints and guiding questions, not direct answers. Use for homework, assignments, or debugging.
+description: Socratic tutoring - hints and guiding questions, not direct answers. Use for homework, assignments, or debugging.
 argument-hint: "[your question or paste code and describe what's wrong]"
 ---
 

@@ -59,9 +59,9 @@ B.S. in Computer Science, Oregon State University                               
 
 CERTIFICATIONS
 
-Cognitive Project Management for AI (CPMAI) PLUS — Project Management Institute  2025
-Certified Scrum Product Owner (CSPO) — Scrum Alliance                            2022
-Project Management Professional (PMP) — Project Management Institute             2022
+Cognitive Project Management for AI (CPMAI) PLUS - Project Management Institute  2025
+Certified Scrum Product Owner (CSPO) - Scrum Alliance                            2022
+Project Management Professional (PMP) - Project Management Institute             2022
 
 ---
 
@@ -87,7 +87,7 @@ When asked to tailor the resume to a job description:
    - Language, keywords, and framing they use (ATS matters)
    - Seniority signals and cultural cues
 
-2. Rewrite Andrew's bullet points to mirror their language while staying truthful to his experience. Don't invent experience — reframe and emphasize what's relevant.
+2. Rewrite Andrew's bullet points to mirror their language while staying truthful to his experience. Don't invent experience - reframe and emphasize what's relevant.
 
 3. Reorder or deprioritize sections/bullets to put the most relevant work first.
 
@@ -104,7 +104,7 @@ When asked to write a cover letter:
 1. Ask for (or use provided): company name, role title, hiring manager name if known, and any specific angle Andrew wants to lead with.
 
 2. Structure:
-   - **Hook** (1–2 sentences): Why this company, why now. Reference something specific — their mission, a product, a recent launch. Not generic.
+   - **Hook** (1–2 sentences): Why this company, why now. Reference something specific - their mission, a product, a recent launch. Not generic.
    - **Why Andrew** (2–3 sentences): Connect his most relevant experience to their top 2–3 needs. Use specifics and numbers from his resume.
    - **Why now** (1–2 sentences): What makes this the right moment for him to bring value.
    - **Close**: Clear ask, confident tone, no groveling.
@@ -130,14 +130,14 @@ When asked to improve a resume section or the overall resume:
 
 3. Flag anything that might raise questions from a hiring manager.
 
-4. Keep Andrew's voice — direct, technically credible, outcome-focused.
+4. Keep Andrew's voice - direct, technically credible, outcome-focused.
 
 ---
 
 ## Principles
 
-- **Never fabricate.** Only use experience that exists in the resume. You can reframe, reorder, and sharpen — not invent.
+- **Never fabricate.** Only use experience that exists in the resume. You can reframe, reorder, and sharpen - not invent.
 - **ATS matters.** Mirror keywords from the JD exactly when tailoring.
 - **Numbers over adjectives.** "Increased adoption by 20%" beats "significantly improved adoption."
-- **Active verbs.** Led, Shipped, Reduced, Built, Drove — not "Responsible for" or "Helped with."
+- **Active verbs.** Led, Shipped, Reduced, Built, Drove - not "Responsible for" or "Helped with."
 - **Specificity signals credibility.** Vague bullets get screened out.

@@ -10,7 +10,7 @@ You are tailoring **Andrew Demers'** resume to a specific role. Follow the `resu
 
 ## Steps
 
-1. **Get the job description.** If an argument was provided, use it — it may be a raw JD, a URL, or a company/role name.
+1. **Get the job description.** If an argument was provided, use it - it may be a raw JD, a URL, or a company/role name.
    - If it's a URL, fetch the page and extract the JD.
    - If it's a company/role name only, ask the user to paste the JD.
    - If no argument was provided, ask: "Paste the job description (or give me a URL)."

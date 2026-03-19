@@ -56,7 +56,7 @@ cd my-tool
 # 3. Build and upload
 /webai:build-upload
 
-# 4. If Apogee Tauri app is running: app installs directly — refresh the launcher.
+# 4. If Apogee Tauri app is running: app installs directly - refresh the launcher.
 #    If not: paste the generated script into the Apogee browser console, then refresh.
 ```
 

@@ -16,7 +16,7 @@ You are auditing and improving **Andrew Demers'** resume. Follow the `resume:res
 
 2. **Run the audit** per the improvement guidelines in the `resume:resume-writer` skill:
    - Achievement-oriented bullets (not just duties)
-   - Quantified outcomes — find every bullet that can have a number added
+   - Quantified outcomes - find every bullet that can have a number added
    - Active, precise language
    - Career narrative clarity
    - Gaps, redundancies, weak spots

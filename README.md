@@ -31,7 +31,7 @@ Five custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`
 Product management workflows for PRDs and planning:
 
 - **Commands:** `/pm:prd`, `/pm:review-prd`, `/pm:notes-to-prd`, `/pm:tech-spec`, `/pm:notion-format`, `/pm:stories`
-- **Skills:** `pm:prd-writing` — PRD writing with Classic and OST templates
+- **Skills:** `pm:prd-writing` - PRD writing with Classic and OST templates
 - **Agents:** `@pm:prd-critic`, `@pm:eng-reader`
 
 See `plugins/marketplaces/local-desktop-app-uploads/pm/README.md` for full usage.
@@ -43,7 +43,7 @@ See `plugins/marketplaces/local-desktop-app-uploads/pm/README.md` for full usage
 Resume and job-application workflows (tailored to Andrew Demers’ resume):
 
 - **Commands:** `/resume:tailor`, `/resume:improve`, `/resume:cover-letter`
-- **Skills:** `resume:resume-writer` — resume as source of truth for tailoring, cover letters, and section improvements
+- **Skills:** `resume:resume-writer` - resume as source of truth for tailoring, cover letters, and section improvements
 
 Plugin files: `plugins/marketplaces/local-desktop-app-uploads/resume/`.
 
@@ -73,10 +73,10 @@ See `plugins/marketplaces/local-desktop-app-uploads/dev/README.md` for full usag
 
 ### Student Assistant plugin
 
-Socratic learning assistant for homework, coursework, and debugging — guides toward answers with hints and questions instead of giving solutions. Assumes Python unless otherwise stated.
+Socratic learning assistant for homework, coursework, and debugging - guides toward answers with hints and questions instead of giving solutions. Assumes Python unless otherwise stated.
 
 - **Commands:** `/student:tutor`
-- **Skills:** `student:student-assistant` — tutor persona, Python default, no direct answers unless asked
+- **Skills:** `student:student-assistant` - tutor persona, Python default, no direct answers unless asked
 
 See `plugins/marketplaces/local-desktop-app-uploads/student-assistant/README.md` for full usage.
 
@@ -89,8 +89,8 @@ If you already have a `~/.claude` with local changes, copy or link the contents 
 
 ## What isn’t tracked
 
-- **`plugins/marketplaces/claude-plugins-official`** — official marketplace is an embedded repo; add as a submodule or manage separately if you want it in Git.
-- **`cache/`**, **`session-env/`**, **`projects/`**, etc. — local/runtime data; excluded so the repo stays portable.
+- **`plugins/marketplaces/claude-plugins-official`** - official marketplace is an embedded repo; add as a submodule or manage separately if you want it in Git.
+- **`cache/`**, **`session-env/`**, **`projects/`**, etc. - local/runtime data; excluded so the repo stays portable.
 
 ## License
 

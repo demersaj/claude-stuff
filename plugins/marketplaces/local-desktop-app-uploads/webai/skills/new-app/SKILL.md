@@ -162,7 +162,7 @@ Scaffold a new app for the webAI Apogee shell.
    - Polls `getOasisState()` every 1.2s and shows AI status in the header
    - Has a back-to-launcher button
    - Shows a "Not running in Apogee" notice in dev mode (when shell APIs are null)
-   - **If `--description` was provided**: generate a meaningful initial UI and logic that reflects what the app is supposed to do — real components, real state, real layout — not a generic placeholder. Use the description to inform the component structure, copy, and any AI prompts passed to `streamCompletion`.
+   - **If `--description` was provided**: generate a meaningful initial UI and logic that reflects what the app is supposed to do - real components, real state, real layout - not a generic placeholder. Use the description to inform the component structure, copy, and any AI prompts passed to `streamCompletion`.
    - **If no description**: use a minimal placeholder main content area.
 
 9. **Print next steps** for the user:
@@ -183,6 +183,6 @@ Scaffold a new app for the webAI Apogee shell.
 - Always use `vite-plugin-singlefile` - this is non-negotiable for Apogee compatibility.
 - Always create `src/webai.js` as the integration layer.
 - Never hardcode app IDs - derive from `package.json` name.
-- Always set `"description"` in `package.json` — use the `--description` value if provided, otherwise derive a short description from the app name.
-- When a description is provided, generate a real starting UI that reflects it — not a generic placeholder. The goal is that the user can immediately run the app and see something meaningful.
+- Always set `"description"` in `package.json` - use the `--description` value if provided, otherwise derive a short description from the app name.
+- When a description is provided, generate a real starting UI that reflects it - not a generic placeholder. The goal is that the user can immediately run the app and see something meaningful.
 - In dev mode, gracefully handle null shell APIs (the app runs outside the iframe during development).

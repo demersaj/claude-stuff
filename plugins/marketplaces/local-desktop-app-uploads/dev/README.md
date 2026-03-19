@@ -6,16 +6,16 @@ A Claude Code plugin that provides a developer persona: takes a PRD or implement
 
 | Command | Description |
 |---------|-------------|
-| `/dev:dev` | Full workflow — understand, plan, and execute |
-| `/dev:understand` | Orient in the codebase — map subsystems, patterns, constraints |
+| `/dev:dev` | Full workflow - understand, plan, and execute |
+| `/dev:understand` | Orient in the codebase - map subsystems, patterns, constraints |
 | `/dev:plan` | Write an implementation plan saved to `plans/` |
-| `/dev:execute` | Execute a plan — dispatch agents, verify, commit |
+| `/dev:execute` | Execute a plan - dispatch agents, verify, commit |
 
 ## Skills
 
 | Skill | Description |
 |-------|-------------|
-| `dev:dev` | Full developer persona — composes understand → plan → execute |
+| `dev:dev` | Full developer persona - composes understand → plan → execute |
 | `dev:understand` | Codebase orientation: read project instructions, map subsystems, identify patterns |
 | `dev:plan` | Write a structured, agent-executable implementation plan saved to `plans/` |
 | `dev:execute` | Orchestrate sub-agents to implement the plan, verify, and commit |
@@ -23,7 +23,7 @@ A Claude Code plugin that provides a developer persona: takes a PRD or implement
 ## Usage
 
 ```bash
-# Full workflow — give it a PRD or feature description
+# Full workflow - give it a PRD or feature description
 /dev:dev Add a dark mode toggle to the settings panel
 
 # Point at a PRD file
