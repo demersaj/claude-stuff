@@ -25,6 +25,11 @@
       "name": "dev",
       "version": "1.0.0",
       "source": "./dev"
+    },
+    {
+      "name": "student-assistant",
+      "version": "1.0.0",
+      "source": "./student-assistant"
     }
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "name": "student",
+  "version": "1.0.0",
+  "description": "Student assistant — guides users toward answers through Socratic questioning and structured hints rather than giving direct solutions",
+  "author": {
+    "name": "local"
+  }
+}
