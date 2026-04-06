@@ -30,6 +30,11 @@
       "name": "student-assistant",
       "version": "1.0.0",
       "source": "./student-assistant"
+    },
+    {
+      "name": "stock-advisor",
+      "version": "1.0.0",
+      "source": "./stock-advisor"
     }
   ]
 }

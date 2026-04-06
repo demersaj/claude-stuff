@@ -14,7 +14,7 @@ Other folders like `tools/`, `prompts/`, `scripts/`, `references/`, and `example
 
 ## Plugins
 
-Five custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`:
+Six custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`:
 
 | Plugin | Path | Description |
 |--------|------|-------------|
@@ -23,6 +23,7 @@ Five custom plugins live under `plugins/marketplaces/local-desktop-app-uploads/`
 | **webai** | `webai/` | Build and deploy React/Vue apps to the webAI Apogee shell. |
 | **Dev** | `dev/` | Developer persona: understand codebase, plan, and execute. |
 | **Student Assistant** | `student-assistant/` | Socratic tutor: hints and guiding questions for homework, assignments, debugging (Python by default). |
+| **Stock Advisor** | `stock-advisor/` | Analyze stocks or companies (public or private): buy/sell/hold report with scoring and web research. |
 
 ---
 
@@ -79,6 +80,17 @@ Socratic learning assistant for homework, coursework, and debugging - guides tow
 - **Skills:** `student:student-assistant` - tutor persona, Python default, no direct answers unless asked
 
 See `plugins/marketplaces/local-desktop-app-uploads/student-assistant/README.md` for full usage.
+
+---
+
+### Stock Advisor plugin
+
+Analyzes any stock or company (public or private) and produces a structured buy/sell/hold recommendation backed by web research and a weighted scorecard.
+
+- **Commands:** `/stock-advisor:analyze [company or ticker]`
+- **Skills:** `stock-advisor:stock-advisor` - classification, research, 6-dimension scorecard, weighted recommendation, and report structure
+
+See `plugins/marketplaces/local-desktop-app-uploads/stock-advisor/README.md` for full usage, scorecard weights, and examples.
 
 ## Sync / setup
 

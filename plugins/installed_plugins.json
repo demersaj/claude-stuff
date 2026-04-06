@@ -45,6 +45,35 @@
         "installedAt": "2026-03-19T00:00:00.000Z",
         "lastUpdated": "2026-03-19T00:00:00.000Z"
       }
+    ],
+    "figma@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/huxley-47/.claude/plugins/cache/claude-plugins-official/figma/2.0.7",
+        "version": "2.0.7",
+        "installedAt": "2026-03-29T14:56:37.118Z",
+        "lastUpdated": "2026-04-02T14:15:42.915Z",
+        "gitCommitSha": "512f1c770037f8bb4a86748df54e219716d64414"
+      }
+    ],
+    "stock-advisor@local-desktop-app-uploads": [
+      {
+        "scope": "user",
+        "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/stock-advisor",
+        "version": "1.0.0",
+        "installedAt": "2026-04-06T00:00:00.000Z",
+        "lastUpdated": "2026-04-06T00:00:00.000Z"
+      }
+    ],
+    "gitlab@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/huxley-47/.claude/plugins/cache/claude-plugins-official/gitlab/7636aad5eeb5",
+        "version": "7636aad5eeb5",
+        "installedAt": "2026-04-02T14:49:12.190Z",
+        "lastUpdated": "2026-04-02T14:49:12.190Z",
+        "gitCommitSha": "7636aad5eeb526a977d4ed2b65b074fddc5be9d8"
+      }
     ]
   }
 }
