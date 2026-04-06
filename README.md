@@ -85,10 +85,10 @@ See `plugins/marketplaces/local-desktop-app-uploads/student-assistant/README.md`
 
 ### Stock Advisor plugin
 
-Analyzes any stock or company (public or private) and produces a structured buy/sell/hold recommendation backed by web research and a weighted scorecard.
+Analyzes any stock or company (public or private) and produces a structured buy/sell/hold recommendation backed by web research and a weighted scorecard. Also supports **portfolio gap analysis**: pass a list of holdings or a portfolio description to get diversification gaps and suggested new public stocks.
 
-- **Commands:** `/stock-advisor:analyze [company or ticker]`
-- **Skills:** `stock-advisor:stock-advisor` - classification, research, 6-dimension scorecard, weighted recommendation, and report structure
+- **Commands:** `/stock-advisor:analyze [company-or-ticker]`, `/stock-advisor:gaps [holdings or description]`
+- **Skills:** `stock-advisor:stock-advisor` (single-name deep dive), `stock-advisor:portfolio-gaps` (gaps and new ideas from a portfolio)
 
 See `plugins/marketplaces/local-desktop-app-uploads/stock-advisor/README.md` for full usage, scorecard weights, and examples.
 
