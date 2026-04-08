@@ -1,0 +1,12 @@
+{
+  "eval_id": 0,
+  "eval_name": "broken-counter",
+  "prompt": "My counter app at apps/broken-counter-app/ has two bugs: (1) clicking 'Ask AI about this number' does nothing in local dev, and (2) when it does run inside Apogee, if the AI request ever fails, subsequent requests hang forever. Please diagnose and fix both issues, then rebuild.",
+  "assertions": [
+    {"text": "No direct window.OasisHost access in App.jsx", "passed": false, "evidence": ""},
+    {"text": "release() called in a finally block", "passed": false, "evidence": ""},
+    {"text": "vite.config.js uses vite-plugin-singlefile", "passed": false, "evidence": ""},
+    {"text": "package.json has description field", "passed": false, "evidence": ""},
+    {"text": "dist/index.html built successfully", "passed": false, "evidence": ""}
+  ]
+}

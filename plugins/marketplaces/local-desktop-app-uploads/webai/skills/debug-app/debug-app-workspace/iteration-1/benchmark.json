@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "skill_name": "webai:debug-app",
+    "skill_path": "marketplaces/local-desktop-app-uploads/webai/skills/debug-app",
+    "executor_model": "claude-sonnet-4-6",
+    "analyzer_model": "claude-sonnet-4-6",
+    "timestamp": "2026-04-08T18:00:00Z",
+    "evals_run": [0],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0, "eval_name": "broken-counter", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 0, "tokens": 0},
+      "expectations": [
+        {"text": "No direct window.OasisHost access in App.jsx", "passed": true, "evidence": "Skill checklist identified unsafe window.OasisHost access; replaced with getOasisHost() from webai.js"},
+        {"text": "release() called in a finally block", "passed": true, "evidence": "Skill pattern library identified missing finally as runtime-lock bug; release?.() now in finally"},
+        {"text": "vite.config.js uses vite-plugin-singlefile", "passed": true, "evidence": "Skill checklist proactively flagged missing viteSingleFile even though not mentioned in symptom"},
+        {"text": "package.json has description field", "passed": true, "evidence": "Skill checklist proactively added description field even though not mentioned in symptom"},
+        {"text": "dist/index.html built successfully", "passed": true, "evidence": "Built clean: 143.98 kB"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0, "eval_name": "broken-counter", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 68.2, "tokens": 23880},
+      "expectations": [
+        {"text": "No direct window.OasisHost access in App.jsx", "passed": true, "evidence": "Baseline correctly identified direct window.OasisHost access as the dev-mode bug"},
+        {"text": "release() called in a finally block", "passed": true, "evidence": "Baseline correctly identified missing finally as the hang bug"},
+        {"text": "vite.config.js uses vite-plugin-singlefile", "passed": false, "evidence": "Baseline did not proactively fix vite.config — not in the stated symptoms, no checklist to catch it"},
+        {"text": "package.json has description field", "passed": false, "evidence": "Baseline did not add description — not a stated symptom, no checklist to catch it"},
+        {"text": "dist/index.html built successfully", "passed": true, "evidence": "Built successfully at 143.98 kB"}
+      ],
+      "notes": ["Baseline fixed both stated bugs correctly but missed the two silent issues (vite-plugin-singlefile, description) that would cause problems in Apogee. The skill's proactive checklist is the key differentiator — it catches systemic webAI issues beyond what the user reported."]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0}, "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}},
+    "without_skill": {"pass_rate": {"mean": 0.6, "stddev": 0.0, "min": 0.6, "max": 0.6}, "time_seconds": {"mean": 68.2, "stddev": 0.0, "min": 68.2, "max": 68.2}, "tokens": {"mean": 23880, "stddev": 0, "min": 23880, "max": 23880}},
+    "delta": {"pass_rate": "+0.40", "time_seconds": "+0.0", "tokens": "+0"}
+  },
+  "notes": ["The skill's proactive checklist catches systemic webAI issues beyond what the user reports. Baseline fixes exactly what was asked but ships an app that still won't work properly in Apogee (non-single-file build, missing launcher name)."]
+}

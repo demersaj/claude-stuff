@@ -1,0 +1,13 @@
+{
+  "eval_name": "vocab-flashcards",
+  "variant": "with_skill",
+  "expectations": [
+    {"text": "Words persisted in localStorage", "passed": true, "evidence": "localStorage.getItem/setItem used for word list"},
+    {"text": "Flip/reveal interaction implemented", "passed": true, "evidence": "revealed state, .flashcard.revealed CSS, click-to-reveal UX"},
+    {"text": "Easy/hard rating implemented", "passed": true, "evidence": "Easy/Hard buttons on revealed cards"},
+    {"text": "AI generates example sentences via streamCompletion", "passed": true, "evidence": "streamCompletion called on AI button click"},
+    {"text": "dist/index.html built", "passed": true, "evidence": "dist/index.html at 168KB"},
+    {"text": "Add-word form present", "passed": true, "evidence": "Form with word/definition inputs and submit handler"}
+  ],
+  "pass_rate": 1.0
+}

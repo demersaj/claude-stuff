@@ -1,0 +1,12 @@
+{
+  "eval_name": "pomodoro-settings",
+  "variant": "with_skill",
+  "expectations": [
+    {"text": "Custom duration input present in App.jsx", "passed": true, "evidence": "workMinutes and breakMinutes state with input fields in a settings panel; draftWork/draftBreak for staged editing"},
+    {"text": "setInterval timer logic preserved", "passed": true, "evidence": "setInterval still drives countdown; intervalRef.current pattern preserved"},
+    {"text": "streamCompletion AI encouragement preserved", "passed": true, "evidence": "streamCompletion imported and called on session complete with persona routing"},
+    {"text": "Session counter preserved", "passed": true, "evidence": "TODAY_KEY session tracking present, session count used in encouragement prompt"},
+    {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "Built clean: 206.84 kB"}
+  ],
+  "pass_rate": 1.0
+}

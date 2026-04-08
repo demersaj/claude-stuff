@@ -1,0 +1,13 @@
+{
+  "eval_name": "standup-memory",
+  "variant": "without_skill",
+  "expectations": [
+    {"text": "src/memory.js created with loadHistory", "passed": false, "evidence": "Baseline implemented memory inline in App.jsx using localStorage instead of OasisHost.loadAppChatHistory — no memory.js module, no Apogee integration"},
+    {"text": "webai.js streamCompletion has ...rest spread", "passed": false, "evidence": "Baseline did not add ...rest spread to webai.js — appId passed to streamCompletion would be silently dropped"},
+    {"text": "App.jsx passes appId to streamCompletion", "passed": false, "evidence": "Baseline used localStorage for persistence rather than Apogee's built-in memory system; no appId passed"},
+    {"text": "App.jsx calls loadHistory on mount", "passed": false, "evidence": "Baseline loaded from localStorage on mount, not from Apogee's loadAppChatHistory — memory won't persist across devices or Apogee reinstalls"},
+    {"text": "App.jsx has clear history button", "passed": true, "evidence": "Clear history button present, clears localStorage"},
+    {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "App builds successfully"}
+  ],
+  "pass_rate": 0.333
+}

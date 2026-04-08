@@ -1,0 +1,46 @@
+{
+  "skill_name": "webai:debug-app",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "My counter app at apps/broken-counter-app/ has two bugs: (1) clicking 'Ask AI about this number' does nothing in local dev, and (2) when it does run inside Apogee, if the AI request ever fails, subsequent requests hang forever and I have to restart Apogee. Please diagnose and fix both issues, then rebuild.",
+      "expected_output": "App.jsx fixed to use getShellAPI/getOasisHost wrapper instead of window.OasisHost directly; release() moved into a finally block; webai.js created with canonical helpers; vite.config.js fixed to use vite-plugin-singlefile; package.json given a description; app builds successfully.",
+      "assertions": [
+        {
+          "name": "no_direct_window_oasishost",
+          "description": "App.jsx no longer accesses window.OasisHost directly",
+          "check": "file_not_contains",
+          "file": "apps/broken-counter-app/src/App.jsx",
+          "pattern": "window.OasisHost"
+        },
+        {
+          "name": "release_in_finally",
+          "description": "release() is called inside a finally block",
+          "check": "file_contains",
+          "file": "apps/broken-counter-app/src/App.jsx",
+          "pattern": "finally"
+        },
+        {
+          "name": "vite_config_singlefile",
+          "description": "vite.config.js now uses vite-plugin-singlefile",
+          "check": "file_contains",
+          "file": "apps/broken-counter-app/vite.config.js",
+          "pattern": "viteSingleFile"
+        },
+        {
+          "name": "package_json_description",
+          "description": "package.json has a description field",
+          "check": "file_contains",
+          "file": "apps/broken-counter-app/package.json",
+          "pattern": "\"description\""
+        },
+        {
+          "name": "dist_built",
+          "description": "dist/index.html was successfully built",
+          "check": "file_exists",
+          "file": "apps/broken-counter-app/dist/index.html"
+        }
+      ]
+    }
+  ]
+}

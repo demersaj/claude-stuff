@@ -1,0 +1,170 @@
+{
+  "skill_name": "webai:create-app",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Build me a Pomodoro timer app for Apogee. It should have a 25-minute countdown, a 5-minute break mode, track how many sessions I've done today, and use AI to give me an encouraging message when I finish a session.",
+      "expected_output": "A complete scaffolded React app in apps/pomodoro-timer/ with: working countdown timer, start/stop/reset, session counter, AI encouragement on session complete (using streamCompletion), OasisState status badge in header, back-to-launcher button, single-file build, and upload to Apogee.",
+      "assertions": [
+        {
+          "name": "vite_config_uses_singlefile",
+          "description": "vite.config.js imports and uses viteSingleFile plugin",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/vite.config.js",
+          "pattern": "viteSingleFile"
+        },
+        {
+          "name": "webai_js_created",
+          "description": "src/webai.js exists with streamCompletion and getOasisHost",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/webai.js",
+          "pattern": "streamCompletion"
+        },
+        {
+          "name": "package_json_has_description",
+          "description": "package.json has a non-empty description field",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/package.json",
+          "pattern": "\"description\""
+        },
+        {
+          "name": "timer_logic_present",
+          "description": "App.jsx has countdown/timer logic (setInterval or useState for time)",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "pattern": "setInterval"
+        },
+        {
+          "name": "ai_integration_present",
+          "description": "App.jsx calls streamCompletion for AI encouragement",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "pattern": "streamCompletion"
+        },
+        {
+          "name": "dist_html_built",
+          "description": "dist/index.html was successfully built",
+          "check": "file_exists",
+          "file": "apps/pomodoro-timer/dist/index.html"
+        },
+        {
+          "name": "release_in_finally",
+          "description": "release() is called in a finally block (prevents runtime lock)",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/webai.js",
+          "pattern": "finally"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Create a webAI app called 'Daily Standup' \u2014 a simple standup meeting helper where I can type what I did yesterday, what I'm doing today, and any blockers, and then click a button to have AI rewrite it in a clear, concise standup format and copy it to my clipboard.",
+      "expected_output": "React app in apps/daily-standup/ with three text inputs (yesterday/today/blockers), an AI rewrite button that streams a formatted standup summary, a copy-to-clipboard button on the output, OasisState badge, back-to-launcher button, and single-file build.",
+      "assertions": [
+        {
+          "name": "three_inputs_present",
+          "description": "App.jsx has state or inputs for yesterday, today, and blockers",
+          "check": "file_contains_any",
+          "file": "apps/daily-standup/src/App.jsx",
+          "patterns": [
+            "yesterday",
+            "today",
+            "blocker"
+          ]
+        },
+        {
+          "name": "clipboard_api_used",
+          "description": "Clipboard copy is implemented",
+          "check": "file_contains",
+          "file": "apps/daily-standup/src/App.jsx",
+          "pattern": "clipboard"
+        },
+        {
+          "name": "streaming_output",
+          "description": "Streaming output is displayed token by token",
+          "check": "file_contains",
+          "file": "apps/daily-standup/src/App.jsx",
+          "pattern": "onToken"
+        },
+        {
+          "name": "dist_html_built",
+          "description": "dist/index.html was successfully built",
+          "check": "file_exists",
+          "file": "apps/daily-standup/dist/index.html"
+        },
+        {
+          "name": "singlefile_plugin",
+          "description": "vite.config.js uses vite-plugin-singlefile",
+          "check": "file_contains",
+          "file": "apps/daily-standup/vite.config.js",
+          "pattern": "viteSingleFile"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Make me a vocab flashcard app for Apogee. I should be able to add words and their definitions, quiz myself (show word, reveal definition on click), rate how well I knew it (easy/hard), and have an AI button that generates an example sentence using the word to help me remember it.",
+      "expected_output": "React app in apps/vocab-flashcards/ with: add-word form, flashcard flip interaction, easy/hard rating, AI example sentence generation per word, word list persisted in localStorage, OasisState badge, and single-file build.",
+      "assertions": [
+        {
+          "name": "localstorage_used",
+          "description": "Words are persisted to localStorage",
+          "check": "file_contains",
+          "file": "apps/vocab-flashcards/src/App.jsx",
+          "pattern": "localStorage"
+        },
+        {
+          "name": "flip_interaction",
+          "description": "Card flip or reveal interaction is implemented",
+          "check": "file_contains_any",
+          "file": "apps/vocab-flashcards/src/App.jsx",
+          "patterns": [
+            "flip",
+            "reveal",
+            "showDef",
+            "isFlipped",
+            "visible",
+            "revealed"
+          ]
+        },
+        {
+          "name": "rating_logic",
+          "description": "Easy/hard rating is implemented",
+          "check": "file_contains_any",
+          "file": "apps/vocab-flashcards/src/App.jsx",
+          "patterns": [
+            "easy",
+            "hard",
+            "rating",
+            "difficulty"
+          ]
+        },
+        {
+          "name": "ai_sentence_generation",
+          "description": "AI generates example sentences",
+          "check": "file_contains",
+          "file": "apps/vocab-flashcards/src/App.jsx",
+          "pattern": "streamCompletion"
+        },
+        {
+          "name": "dist_html_built",
+          "description": "dist/index.html was successfully built",
+          "check": "file_exists",
+          "file": "apps/vocab-flashcards/dist/index.html"
+        },
+        {
+          "name": "add_word_form",
+          "description": "Form to add new words exists",
+          "check": "file_contains_any",
+          "file": "apps/vocab-flashcards/src/App.jsx",
+          "patterns": [
+            "addWord",
+            "handleAdd",
+            "newWord",
+            "setWord"
+          ]
+        }
+      ]
+    }
+  ]
+}

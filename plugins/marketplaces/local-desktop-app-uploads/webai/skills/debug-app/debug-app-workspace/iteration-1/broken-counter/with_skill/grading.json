@@ -1,0 +1,12 @@
+{
+  "eval_name": "broken-counter",
+  "variant": "with_skill",
+  "expectations": [
+    {"text": "No direct window.OasisHost access in App.jsx", "passed": true, "evidence": "Skill checklist led agent to replace window.OasisHost with getOasisHost() from webai.js; no direct window.OasisHost remains"},
+    {"text": "release() called in a finally block", "passed": true, "evidence": "Skill identified missing finally as the runtime-lock bug; release?.() now in finally block"},
+    {"text": "vite.config.js uses vite-plugin-singlefile", "passed": true, "evidence": "Skill checklist flagged missing viteSingleFile; vite.config.js now has viteSingleFile(), esnext, assetsInlineLimit, cssCodeSplit: false"},
+    {"text": "package.json has description field", "passed": true, "evidence": "Skill checklist includes description field check; 'description': 'Counter App' added"},
+    {"text": "dist/index.html built successfully", "passed": true, "evidence": "Built clean: 143.98 kB single-file output"}
+  ],
+  "pass_rate": 1.0
+}

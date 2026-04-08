@@ -1,0 +1,12 @@
+{
+  "eval_name": "daily-standup",
+  "variant": "with_skill",
+  "expectations": [
+    {"text": "Three inputs for yesterday/today/blockers", "passed": true, "evidence": "App.jsx has yesterday, today, blockers state fields"},
+    {"text": "Clipboard copy implemented", "passed": true, "evidence": "navigator.clipboard used in copy handler"},
+    {"text": "Streaming output with onToken", "passed": true, "evidence": "onToken callback passed to streamCompletion"},
+    {"text": "dist/index.html built", "passed": true, "evidence": "dist/index.html at 200KB"},
+    {"text": "vite-plugin-singlefile used", "passed": true, "evidence": "vite.config.js contains viteSingleFile"}
+  ],
+  "pass_rate": 1.0
+}

@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "skill_name": "webai:add-persona",
+    "skill_path": "marketplaces/local-desktop-app-uploads/webai/skills/add-persona",
+    "executor_model": "claude-sonnet-4-6",
+    "analyzer_model": "claude-sonnet-4-6",
+    "timestamp": "2026-04-08T18:00:00Z",
+    "evals_run": [0],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0, "eval_name": "pomodoro-persona", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 0, "tokens": 0},
+      "expectations": [
+        {"text": "src/persona.js created with requestPersonaAccess", "passed": true, "evidence": "persona.js exists with getPersonas, requestPersonaAccess, getPermittedPersonas — exactly matching skill template"},
+        {"text": "webai.js streamCompletion has ...rest spread", "passed": true, "evidence": "webai.js has ...rest spread forwarding personaType through to host.request()"},
+        {"text": "App.jsx passes personaType or personaId to streamCompletion", "passed": true, "evidence": "personaType: persona.id passed to streamCompletion in encouragement call"},
+        {"text": "Persona picker UI present in App.jsx", "passed": true, "evidence": "Full persona picker with PERSONAS array, localStorage persistence, styled cards"},
+        {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "Built clean: 206.84 kB single-file output"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0, "eval_name": "pomodoro-persona", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 0, "tokens": 0},
+      "expectations": [
+        {"text": "src/persona.js created with requestPersonaAccess", "passed": false, "evidence": "Baseline added PERSONAS inline in App.jsx — no persona.js module, no requestPersonaAccess call to Apogee permission system"},
+        {"text": "webai.js streamCompletion has ...rest spread", "passed": false, "evidence": "Baseline did not add ...rest spread — personaType silently dropped before reaching host.request()"},
+        {"text": "App.jsx passes personaType or personaId to streamCompletion", "passed": true, "evidence": "personaType passed to streamCompletion (though dropped without the ...rest fix)"},
+        {"text": "Persona picker UI present in App.jsx", "passed": true, "evidence": "Persona selector UI present with motivational/strict options"},
+        {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "App builds successfully"}
+      ],
+      "notes": ["Baseline persona picker looks correct but is non-functional at runtime — personaType is silently dropped without the ...rest spread fix in webai.js"]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0}, "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}},
+    "without_skill": {"pass_rate": {"mean": 0.6, "stddev": 0.0, "min": 0.6, "max": 0.6}, "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0}, "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}},
+    "delta": {"pass_rate": "+0.40", "time_seconds": "+0.0", "tokens": "+0"}
+  },
+  "notes": ["Key discriminator: the ...rest spread fix in webai.js. Without it, personaType reaches the streamCompletion call but is silently discarded before host.request() — the picker looks functional but does nothing at runtime. Skill also enforces a separate persona.js module with requestPersonaAccess for Apogee's permission system."]
+}

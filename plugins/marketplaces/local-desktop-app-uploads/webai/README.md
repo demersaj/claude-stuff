@@ -6,10 +6,15 @@ Build and deploy React or Vue apps to the webAI Apogee shell.
 
 | Command | What it does |
 |---------|-------------|
+| `/webai:create-app <description>` | Idea → full working app → upload in one shot |
 | `/webai:new-app <name> [react\|vue] [--description "..."]` | Scaffold a new Vite app wired to Apogee shell APIs |
+| `/webai:update-app <app> <change>` | Modify an existing app, rebuild, and upload |
+| `/webai:debug-app <app> [symptom]` | Diagnose and fix a broken app |
 | `/webai:build-upload [--open]` | Build to single HTML, install into running Apogee Tauri shell (or paste script) |
 | `/webai:add-oasis [file]` | Add OasisHost AI inference wiring to a component |
 | `/webai:add-collab [file]` | Add CollaborationManager P2P wiring to a component |
+| `/webai:add-persona [file]` | Add Apogee persona support to an existing app |
+| `/webai:add-memory [file]` | Add persistent AI conversation memory to an existing app |
 
 ## Skills
 
@@ -17,11 +22,16 @@ Agent skills (auto-triggered in Cursor/Claude Code when relevant):
 
 | Skill | What it does |
 |-------|---------------|
+| **create-app** | Idea → full working app → upload in one shot. Scaffold, implement real UI, build, upload |
+| **new-app** | Scaffold a new React or Vue app for the webAI Apogee shell |
+| **update-app** | Modify an existing app (add feature, fix bug, restyle), rebuild, and upload |
+| **debug-app** | Diagnose and fix broken apps — build failures, runtime crashes, AI not working, upload errors |
 | **build-upload** | Build the current webAI app to a single HTML file and upload it directly to the running Apogee Tauri shell |
 | **webai-app** | webAI Apogee shell app architecture and APIs. Reference for building single-file React/Vue apps with OasisHost AI, navigation, collaboration, and identity APIs |
-| **new-app** | Scaffold a new React or Vue app for the webAI Apogee shell |
 | **add-oasis** | Add OasisHost AI inference wiring to an existing webAI app |
-| **add-collab** | Add CollaborationManager (P2P rooms, CRDT, chat) wiring to an existing webAI app |
+| **add-collab** | Add CollaborationManager (P2P rooms, CRDT state sync, presence, chat, voice, file sharing) wiring to an existing webAI app |
+| **add-persona** | Add Apogee persona support — hardcoded specialty, user-selectable picker, or full permission flow |
+| **add-memory** | Add persistent AI conversation memory — scrollable history, auto-saved per app, clear button |
 
 ## Installation
 
@@ -43,21 +53,28 @@ Or from inside Claude Code:
 /plugin install webai
 ```
 
-## Typical workflow
+## Typical workflows
 
 ```bash
-# 1. Scaffold a new app
-/webai:new-app my-tool tool-desciption react 
+# Build a new app from scratch (recommended)
+/webai:create-app a pomodoro timer with AI encouragement
 
-# 2. Build your app in Claude Code (or manually)
-cd my-tool
+# Or scaffold manually, then build
+/webai:new-app my-tool react
 # ... edit src/App.jsx ...
-
-# 3. Build and upload
 /webai:build-upload
 
-# 4. If Apogee Tauri app is running: app installs directly - refresh the launcher.
-#    If not: paste the generated script into the Apogee browser console, then refresh.
+# Add features to an existing app
+/webai:add-oasis          # wire in AI inference
+/webai:add-memory         # persistent chat history
+/webai:add-persona        # persona selection
+/webai:add-collab         # P2P collaboration
+
+# Iterate on a built app
+/webai:update-app pomodoro-timer add a dark mode toggle
+
+# Fix a broken app
+/webai:debug-app my-app the AI button does nothing
 ```
 
 ## How uploads work

@@ -1,0 +1,46 @@
+{
+  "skill_name": "webai:add-persona",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Add a persona picker to my pomodoro timer app at apps/pomodoro-timer/. Let me choose between different AI coaching styles before I start a session — at least a 'motivational' and a 'strict' option. The selected persona should influence the encouragement message the AI gives when I finish a session.",
+      "expected_output": "src/persona.js created with getPersonas/requestPersonaAccess helpers; webai.js updated with ...rest spread; App.jsx has a persona selector UI; streamCompletion calls include personaType or personaId; app rebuilds successfully.",
+      "assertions": [
+        {
+          "name": "persona_js_created",
+          "description": "src/persona.js exists with getPersonas or requestPersonaAccess",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/persona.js",
+          "pattern": "requestPersonaAccess"
+        },
+        {
+          "name": "webai_js_rest_spread",
+          "description": "webai.js streamCompletion spreads ...rest into host.request so personaType is not dropped",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/webai.js",
+          "pattern": "...rest"
+        },
+        {
+          "name": "persona_option_passed",
+          "description": "App.jsx passes personaType or personaId to streamCompletion",
+          "check": "file_contains_any",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "patterns": ["personaType", "personaId"]
+        },
+        {
+          "name": "picker_ui_present",
+          "description": "App.jsx has a selector, dropdown, or button for persona choice",
+          "check": "file_contains_any",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "patterns": ["select", "persona", "coach", "motivat", "strict"]
+        },
+        {
+          "name": "dist_rebuilt",
+          "description": "dist/index.html was rebuilt after changes",
+          "check": "file_exists",
+          "file": "apps/pomodoro-timer/dist/index.html"
+        }
+      ]
+    }
+  ]
+}

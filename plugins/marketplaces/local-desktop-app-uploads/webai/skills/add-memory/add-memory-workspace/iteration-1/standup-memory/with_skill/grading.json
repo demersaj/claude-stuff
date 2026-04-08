@@ -1,0 +1,13 @@
+{
+  "eval_name": "standup-memory",
+  "variant": "with_skill",
+  "expectations": [
+    {"text": "src/memory.js created with loadHistory", "passed": true, "evidence": "memory.js created with loadHistory, clearHistory, getAppId, formatTurnTime — exactly matching skill template"},
+    {"text": "webai.js streamCompletion has ...rest spread", "passed": true, "evidence": "webai.js has ...rest spread, forwarding appId and other options through to host.request()"},
+    {"text": "App.jsx passes appId to streamCompletion", "passed": true, "evidence": "App.jsx imports getAppId and passes appId to every streamCompletion call"},
+    {"text": "App.jsx calls loadHistory on mount", "passed": true, "evidence": "useEffect on mount calls loadHistory(appId).then(mem => setTurns(mem.recentTurns))"},
+    {"text": "App.jsx has clear history button", "passed": true, "evidence": "'Clear history' button wired to clearHistory(appId) with state reset"},
+    {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "Built clean: 206.98 kB single-file output"}
+  ],
+  "pass_rate": 1.0
+}

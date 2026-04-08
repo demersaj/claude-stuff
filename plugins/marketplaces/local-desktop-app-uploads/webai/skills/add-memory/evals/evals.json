@@ -1,0 +1,53 @@
+{
+  "skill_name": "webai:add-memory",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Add conversation memory to my daily standup app at apps/daily-standup/. The AI should remember my previous standups so it can reference patterns over time — e.g. if I keep mentioning the same blocker, it should notice. Show a history of past AI responses and add a 'Clear history' button.",
+      "expected_output": "src/memory.js created with loadHistory/clearHistory helpers; webai.js updated with ...rest spread; App.jsx loads history on mount, shows past turns, passes appId to streamCompletion, has a clear history button; app rebuilds.",
+      "assertions": [
+        {
+          "name": "memory_js_created",
+          "description": "src/memory.js exists with loadHistory and clearHistory",
+          "check": "file_contains",
+          "file": "apps/daily-standup/src/memory.js",
+          "pattern": "loadHistory"
+        },
+        {
+          "name": "webai_js_rest_spread",
+          "description": "webai.js streamCompletion spreads ...rest so appId is not dropped",
+          "check": "file_contains",
+          "file": "apps/daily-standup/src/webai.js",
+          "pattern": "...rest"
+        },
+        {
+          "name": "appid_passed",
+          "description": "App.jsx passes appId to streamCompletion",
+          "check": "file_contains",
+          "file": "apps/daily-standup/src/App.jsx",
+          "pattern": "appId"
+        },
+        {
+          "name": "load_history_on_mount",
+          "description": "App.jsx calls loadHistory (or loadAppChatHistory) on mount",
+          "check": "file_contains_any",
+          "file": "apps/daily-standup/src/App.jsx",
+          "patterns": ["loadHistory", "loadAppChatHistory"]
+        },
+        {
+          "name": "clear_button_present",
+          "description": "App.jsx has a clear history button or action",
+          "check": "file_contains_any",
+          "file": "apps/daily-standup/src/App.jsx",
+          "patterns": ["clearHistory", "clearAppChatHistory", "Clear history", "clear history"]
+        },
+        {
+          "name": "dist_rebuilt",
+          "description": "dist/index.html was rebuilt after changes",
+          "check": "file_exists",
+          "file": "apps/daily-standup/dist/index.html"
+        }
+      ]
+    }
+  ]
+}

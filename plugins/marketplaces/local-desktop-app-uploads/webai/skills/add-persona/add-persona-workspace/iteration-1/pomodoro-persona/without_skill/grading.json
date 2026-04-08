@@ -1,0 +1,12 @@
+{
+  "eval_name": "pomodoro-persona",
+  "variant": "without_skill",
+  "expectations": [
+    {"text": "src/persona.js created with requestPersonaAccess", "passed": false, "evidence": "Baseline added PERSONAS array inline in App.jsx but did not create a separate persona.js helper module — no requestPersonaAccess call to Apogee's permission system"},
+    {"text": "webai.js streamCompletion has ...rest spread", "passed": false, "evidence": "Baseline updated webai.js but did not add ...rest spread — personaType would be silently dropped before reaching host.request()"},
+    {"text": "App.jsx passes personaType or personaId to streamCompletion", "passed": true, "evidence": "Baseline passed personaType to streamCompletion call, though it would be dropped without the ...rest fix"},
+    {"text": "Persona picker UI present in App.jsx", "passed": true, "evidence": "Persona selector UI present with motivational/strict options"},
+    {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "App builds successfully at 206.84 kB"}
+  ],
+  "pass_rate": 0.6
+}

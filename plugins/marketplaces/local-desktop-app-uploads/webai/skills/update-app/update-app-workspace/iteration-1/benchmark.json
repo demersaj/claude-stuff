@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "skill_name": "webai:update-app",
+    "skill_path": "marketplaces/local-desktop-app-uploads/webai/skills/update-app",
+    "executor_model": "claude-sonnet-4-6",
+    "analyzer_model": "claude-sonnet-4-6",
+    "timestamp": "2026-04-08T18:00:00Z",
+    "evals_run": [0],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0, "eval_name": "pomodoro-settings", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 0, "tokens": 0},
+      "expectations": [
+        {"text": "Custom duration input present in App.jsx", "passed": true, "evidence": "workMinutes/breakMinutes state with input fields; draftWork/draftBreak for staged editing before applying"},
+        {"text": "setInterval timer logic preserved", "passed": true, "evidence": "setInterval countdown logic intact; intervalRef.current pattern preserved"},
+        {"text": "streamCompletion AI encouragement preserved", "passed": true, "evidence": "streamCompletion call preserved with persona routing"},
+        {"text": "Session counter preserved", "passed": true, "evidence": "TODAY_KEY session tracking intact"},
+        {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "Built clean: 206.84 kB"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0, "eval_name": "pomodoro-settings", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 0, "tokens": 0},
+      "expectations": [
+        {"text": "Custom duration input present in App.jsx", "passed": true, "evidence": "workMinutes/breakMinutes inputs present"},
+        {"text": "setInterval timer logic preserved", "passed": true, "evidence": "Timer logic preserved"},
+        {"text": "streamCompletion AI encouragement preserved", "passed": true, "evidence": "AI encouragement preserved"},
+        {"text": "Session counter preserved", "passed": true, "evidence": "Session counter preserved"},
+        {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "Built successfully"}
+      ],
+      "notes": ["Both variants passed. update-app is a general-purpose skill — the value is in the process (read-before-write, targeted edits, preserve existing) which prevents destructive rewrites. This particular eval had a straightforward additive change that both approaches handled correctly."]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0}, "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}},
+    "without_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0}, "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}},
+    "delta": {"pass_rate": "+0.00", "time_seconds": "+0.0", "tokens": "+0"}
+  },
+  "notes": ["Zero delta on this eval — the additive settings panel task was simple enough that both approaches succeeded. The skill's value for update-app shows better on more complex changes (e.g. refactoring existing logic, adding features that conflict with existing state). Consider adding a harder eval: modify a feature that requires understanding existing state management."]
+}

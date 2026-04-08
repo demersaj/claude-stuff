@@ -1,0 +1,12 @@
+{
+  "eval_name": "broken-counter",
+  "variant": "without_skill",
+  "expectations": [
+    {"text": "No direct window.OasisHost access in App.jsx", "passed": true, "evidence": "Baseline correctly identified direct window.OasisHost access as the dev-mode bug and added a null-safe wrapper"},
+    {"text": "release() called in a finally block", "passed": true, "evidence": "Baseline correctly identified missing finally as the hang bug and added try/finally with release?.()"},
+    {"text": "vite.config.js uses vite-plugin-singlefile", "passed": false, "evidence": "Baseline did not identify missing vite-plugin-singlefile as a bug — it was not mentioned in the symptom description and baseline lacked the webAI-specific checklist that flags this proactively"},
+    {"text": "package.json has description field", "passed": false, "evidence": "Baseline did not add description to package.json — not a stated symptom and baseline lacked the webAI-specific checklist that includes this as a standard fix"},
+    {"text": "dist/index.html built successfully", "passed": true, "evidence": "Built successfully at 143.98 kB (both variants share the same files; without-skill fixed the two stated bugs correctly)"}
+  ],
+  "pass_rate": 0.6
+}

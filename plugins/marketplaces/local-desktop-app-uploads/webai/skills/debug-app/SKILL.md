@@ -1,0 +1,255 @@
+---
+name: debug-app
+description: >
+  Diagnose and fix a broken webAI Apogee app — build failures, runtime crashes, AI not working, app not appearing in launcher, upload errors, or any other problem with an app in apps/.
+  Use this skill when the user says their app is broken, "the build failed", "the AI isn't working", "app won't load", "nothing happens when I click", "it's not showing up in Apogee", "the AI hangs", or pastes an error message related to a webAI app.
+argument-hint: "<app-name-or-path> [error message or symptom]"
+allowed-tools: Bash, Read, Write, Glob, Grep
+---
+
+# webAI Debug App
+
+Diagnose and fix a broken Apogee shell app.
+
+## Step 1 — Understand the symptom
+
+Identify what kind of failure this is. The user may have told you directly, or you'll need to ask:
+
+- **Build error** — `npm run build` failed with an error message
+- **Upload error** — build succeeded but `scripts/upload.js` failed or app didn't install
+- **App not in launcher** — app installed but doesn't appear, or has wrong name
+- **App won't load** — blank screen, error overlay, or crash on open in Apogee
+- **AI does nothing** — clicking generate/submit has no effect; no output, no error
+- **AI hangs** — generation starts but never finishes; subsequent requests also hang
+- **Wrong behavior** — app loads and AI responds but something specific is broken
+- **Dev server issue** — `npm run dev` fails or shows errors
+
+If the user pasted an error message, read it carefully — the symptom type is usually obvious from it.
+
+## Step 2 — Locate and read the app
+
+Find the app in `apps/<name>/`. Read:
+
+```
+apps/<name>/package.json
+apps/<name>/vite.config.js
+apps/<name>/src/webai.js        (if it exists)
+apps/<name>/src/App.jsx         (or App.vue)
+```
+
+Read any other files mentioned in the error. Don't guess — read the actual code.
+
+## Step 3 — Run diagnostics
+
+Based on the symptom, check the known failure patterns below. Many issues have a canonical fix.
+
+---
+
+## Known failure patterns
+
+### BUILD FAILURES
+
+**"Cannot find module 'vite-plugin-singlefile'"**
+```bash
+cd apps/<name> && npm install --save-dev vite-plugin-singlefile
+```
+
+**"Cannot find module './webai.js'" or similar missing import**
+Check if `src/webai.js` exists. If not, create it from the canonical template (see the `create-app` skill reference). Also check for typos in import paths — casing matters on Linux.
+
+**"X is declared but never used" / "Y is assigned but value never used"**
+Remove the unused variable or import. In strict Vite builds these are errors, not warnings.
+
+**JSX/syntax error — "Unexpected token", "Expected closing tag"**
+Read the file around the line number in the error. Common causes: unclosed JSX tag, missing return parentheses around multi-line JSX, `{` / `}` mismatch.
+
+**"Failed to resolve import" for a relative path**
+The import path is wrong. Check the file actually exists at that path relative to the importing file.
+
+---
+
+### APP NOT IN LAUNCHER / WRONG NAME
+
+**App doesn't appear after upload**
+- Verify `dist/index.html` exists: `ls apps/<name>/dist/index.html`
+- Check the upload script output — did it say "Uploaded" or fall back to a paste script?
+- If paste script: copy it and run it in Apogee DevTools (Cmd+Option+I → Console)
+
+**Wrong display name in launcher (shows package name, not a readable title)**
+`package.json` is missing the `"description"` field, or it's empty. The Apogee launcher uses `description` as the app's display name.
+
+```json
+{
+  "name": "my-app",
+  "description": "My App",   ← add or fix this
+  ...
+}
+```
+
+Rebuild and re-upload after fixing.
+
+---
+
+### APP WON'T LOAD (blank screen / crash on open)
+
+**App loads but shows blank white screen**
+Almost always an uncaught JS error at startup. Open Apogee DevTools (Cmd+Option+I) and check the Console for the actual error, then trace it back to the source.
+
+**"Cannot read properties of null" at startup**
+The app is accessing a shell API directly (`window.OasisHost`, `window.CollaborationManager`, etc.) without a null guard. Outside Apogee these are undefined. Fix: always access via `getShellAPI()` from `webai.js`.
+
+```javascript
+// Bad — throws if OasisHost is null
+const host = window.OasisHost;
+host.getStatus();
+
+// Good — returns null safely
+import { getOasisHost } from './webai.js';
+const host = getOasisHost();
+if (!host) return; // dev mode, no crash
+```
+
+**App is not a single file (loads but breaks with asset errors)**
+`vite.config.js` is missing or misconfigured. It must match this exactly:
+
+```javascript
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { viteSingleFile } from 'vite-plugin-singlefile';
+
+export default defineConfig({
+  plugins: [react(), viteSingleFile()],
+  build: {
+    target: 'esnext',
+    assetsInlineLimit: 100000000,
+    cssCodeSplit: false,
+  },
+});
+```
+
+Verify with: `grep -c "viteSingleFile\|assetsInlineLimit" apps/<name>/vite.config.js` — should return 2.
+
+---
+
+### AI DOES NOTHING (no output, no error)
+
+**Clicking generate has no visible effect**
+Usually one of:
+1. The `OasisHost` is null (dev mode outside Apogee) and the app doesn't show an error
+2. The event handler isn't connected to the button
+3. `streamCompletion` is throwing but the error is swallowed
+
+Check `webai.js` exists and the button's `onClick` calls the generate function. Add a visible error state if missing:
+
+```jsx
+} catch (e) {
+  setOutput(`Error: ${e.message}`);  // ← make sure this exists
+}
+```
+
+**`streamCompletion` is called but `onToken` never fires**
+The `onToken` option is being dropped before reaching `host.request()`. This happens when `webai.js` doesn't spread `...rest`:
+
+```javascript
+// Bad — onToken, personaType, appId etc. silently dropped
+return await host.request(prompt, { systemPrompt, maxTokens, temperature, onToken });
+
+// Good — all extra options forwarded
+export async function streamCompletion(prompt, { systemPrompt = '', maxTokens = 2048, temperature = 0.7, onToken, ...rest } = {}) {
+  ...
+  return await host.request(prompt, { systemPrompt, maxTokens, temperature, onToken, ...rest });
+```
+
+**`personaType` or `appId` passed but has no effect**
+Same root cause as above — missing `...rest` spread. Apply the fix.
+
+---
+
+### AI HANGS (generation starts, never finishes; subsequent requests also hang)
+
+**Root cause: `release()` not called after `host.acquire()`**
+If `release()` is missing or not in a `finally` block, the AI runtime stays locked after any error. Every subsequent `acquire()` call waits forever.
+
+Check `src/webai.js` for this pattern:
+
+```javascript
+// Bad — release() skipped on error
+const release = await host.acquire({ warmRuntime: true });
+const result = await host.request(prompt, opts);
+release();   // ← never reached if host.request throws
+return result;
+
+// Good — release() in finally
+const release = await host.acquire({ warmRuntime: true });
+try {
+  return await host.request(prompt, opts);
+} finally {
+  release?.();   // ← always runs, even on error
+}
+```
+
+**Fix:** Add `try/finally` around `host.request()`. Then reload the Apogee shell (Cmd+R) to reset the lock — the lock persists in memory until the shell restarts.
+
+---
+
+### UPLOAD / INSTALL ERRORS
+
+**"dist/index.html not found"**
+The build hasn't been run or failed silently. Run `npm run build` and check for errors.
+
+**"scripts/upload.js not found"**
+The upload script path is wrong. From an app directory, it should be `node ../../scripts/upload.js`. If the file genuinely doesn't exist at `<repo-root>/scripts/upload.js`, the user needs to pull the latest repo.
+
+**Upload script runs but app doesn't install**
+If the Tauri app isn't running, the POST to `127.0.0.1:44280` fails and the script falls back to a paste script. Copy the paste script output and run it in:
+Apogee → Cmd+Option+I → Console → paste → Enter → reload launcher.
+
+---
+
+## Step 4 — Fix and verify
+
+Apply the fix. Then:
+
+1. **Rebuild:** `cd apps/<name> && npm run build`
+2. **Check for errors** — read the full build output
+3. **Re-upload:** `node ../../scripts/upload.js`
+
+If the problem was a runtime issue (not a build error), check `dist/index.html` exists and is a single self-contained file with no external URLs:
+```bash
+grep -c "https\?://" apps/<name>/dist/index.html
+```
+Should return 0 (or only data URIs/inline sources).
+
+## Step 5 — Report
+
+```
+✅ Fixed: <what the problem was>
+✅ Rebuilt: dist/index.html (XXX KB)
+✅ Uploaded to Apogee — refresh the launcher.
+
+Root cause: <one sentence>
+Fix applied: <one sentence>
+```
+
+If you couldn't fully diagnose the issue (e.g. the error only appears in Apogee at runtime and the user hasn't shared the DevTools output), tell them exactly what to look for:
+
+```
+To see the runtime error:
+  Apogee → open the app → Cmd+Option+I → Console tab
+  Paste the error here and I'll fix it.
+```
+
+---
+
+## Checklist (run through for hard-to-diagnose issues)
+
+When the symptom is vague ("it's broken", "something's wrong"), check these in order:
+
+- [ ] `vite.config.js` has `viteSingleFile()` and correct build options
+- [ ] `package.json` has `"description"` field
+- [ ] `src/webai.js` exists and uses `getShellAPI()` accessor pattern
+- [ ] `webai.js` `streamCompletion` has `...rest` spread
+- [ ] `release()` is in a `finally` block in `webai.js`
+- [ ] No direct `window.OasisHost` / `window.CollaborationManager` access in `App.jsx`
+- [ ] `dist/index.html` exists and was built recently (`ls -lh apps/<name>/dist/`)
+- [ ] Error state is shown in the UI (`catch (e) { setOutput(e.message) }`)

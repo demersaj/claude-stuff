@@ -15,25 +15,20 @@ Add OasisHost AI inference to a webAI app component or file.
 
 2. **Identify where to add AI** - if a file/component path is provided, use it. Otherwise, examine `src/` and ask the user which component should have AI capabilities.
 
-3. **Check for `src/webai.js`** - if it exists and exports `streamCompletion` and `getOasisState`, import from there. If not, add the functions inline.
+3. **Check for `src/webai.js`** - if it exists and exports `streamCompletion` and `getOasisState`, import from there. If not, add the functions inline using the canonical implementations from the webai-app skill reference.
 
 4. **Framework detection** - read `package.json` to determine React or Vue.
 
 5. **For React** - add to the target component:
    ```jsx
+   // Import from webai.js if it exists, otherwise add inline
+   import { streamCompletion, getOasisState } from './webai.js';
+
    // Oasis state polling
    const [oasisState, setOasisState] = useState('waiting');
    useEffect(() => {
-     const probe = () => {
-       const host = window.OasisHost ?? window.parent?.OasisHost;
-       if (!host?.getStatus) return 'waiting';
-       const s = host.getStatus();
-       if (s?.lastModel) return 'ready';
-       if (s?.loadingModel || s?.isGenerating) return 'loading';
-       return 'waiting';
-     };
-     setOasisState(probe());
-     const id = setInterval(() => setOasisState(probe()), 1200);
+     setOasisState(getOasisState());
+     const id = setInterval(() => setOasisState(getOasisState()), 1200);
      return () => clearInterval(id);
    }, []);
 
@@ -45,11 +40,10 @@ Add OasisHost AI inference to a webAI app component or file.
      setIsGenerating(true);
      setAiOutput('');
      try {
-       await streamCompletion(
-         userPrompt,
-         'You are a helpful assistant.', // customize system prompt
-         (token) => setAiOutput(prev => prev + token)
-       );
+       await streamCompletion(userPrompt, {
+         systemPrompt: 'You are a helpful assistant.', // customize to match app purpose
+         onToken: (token) => setAiOutput(prev => prev + token),
+       });
      } catch (err) {
        setAiOutput('Error: ' + err.message);
      } finally {
@@ -61,22 +55,16 @@ Add OasisHost AI inference to a webAI app component or file.
 6. **For Vue** - add to the target component:
    ```javascript
    // In <script setup>
+   import { streamCompletion, getOasisState } from './webai.js';
+
    const oasisState = ref('waiting');
    const aiOutput = ref('');
    const isGenerating = ref(false);
    let oasisInterval = null;
 
    onMounted(() => {
-     const probe = () => {
-       const host = window.OasisHost ?? window.parent?.OasisHost;
-       if (!host?.getStatus) return 'waiting';
-       const s = host.getStatus();
-       if (s?.lastModel) return 'ready';
-       if (s?.loadingModel || s?.isGenerating) return 'loading';
-       return 'waiting';
-     };
-     oasisState.value = probe();
-     oasisInterval = setInterval(() => { oasisState.value = probe(); }, 1200);
+     oasisState.value = getOasisState();
+     oasisInterval = setInterval(() => { oasisState.value = getOasisState(); }, 1200);
    });
 
    onUnmounted(() => clearInterval(oasisInterval));
@@ -85,11 +73,10 @@ Add OasisHost AI inference to a webAI app component or file.
      isGenerating.value = true;
      aiOutput.value = '';
      try {
-       await streamCompletion(
-         userPrompt,
-         'You are a helpful assistant.',
-         (token) => { aiOutput.value += token; }
-       );
+       await streamCompletion(userPrompt, {
+         systemPrompt: 'You are a helpful assistant.',
+         onToken: (token) => { aiOutput.value += token; },
+       });
      } catch (err) {
        aiOutput.value = 'Error: ' + err.message;
      } finally {
@@ -108,6 +95,7 @@ Add OasisHost AI inference to a webAI app component or file.
 ## Rules
 
 - Never remove existing component logic - only add AI wiring alongside it.
-- Always handle the case where `OasisHost` is null (dev environment outside Apogee).
+- Always import `streamCompletion` and `getOasisState` from `src/webai.js` if it exists — never inline duplicate implementations or access `window.OasisHost` directly. The safe accessor in `webai.js` handles null-safety for dev mode.
+- `streamCompletion` takes an options object as the second arg: `{ systemPrompt, maxTokens, temperature, onToken }` — not positional arguments.
 - Always clean up the polling interval on unmount/unmounted.
 - Customize system prompt placeholder to match the app's apparent purpose.

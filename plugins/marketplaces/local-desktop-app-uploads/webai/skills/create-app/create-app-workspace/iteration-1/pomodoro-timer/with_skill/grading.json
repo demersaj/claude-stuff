@@ -1,0 +1,14 @@
+{
+  "eval_name": "pomodoro-timer",
+  "variant": "with_skill",
+  "expectations": [
+    {"text": "vite.config.js uses viteSingleFile plugin", "passed": true, "evidence": "vite.config.js contains viteSingleFile import and usage"},
+    {"text": "src/webai.js exists with streamCompletion", "passed": true, "evidence": "webai.js exports streamCompletion with acquire/request/finally pattern"},
+    {"text": "package.json has description field", "passed": true, "evidence": "package.json contains description field"},
+    {"text": "App.jsx has timer logic with setInterval", "passed": true, "evidence": "App.jsx uses setInterval for countdown"},
+    {"text": "App.jsx calls streamCompletion for AI encouragement", "passed": true, "evidence": "streamCompletion called on session complete"},
+    {"text": "dist/index.html was built successfully", "passed": true, "evidence": "dist/index.html exists at 200KB"},
+    {"text": "release() is called in a finally block", "passed": true, "evidence": "webai.js wraps host.request in try/finally with release()"}
+  ],
+  "pass_rate": 1.0
+}

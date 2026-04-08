@@ -1,0 +1,12 @@
+{
+  "eval_name": "pomodoro-persona",
+  "variant": "with_skill",
+  "expectations": [
+    {"text": "src/persona.js created with requestPersonaAccess", "passed": true, "evidence": "persona.js exists with getPersonas, requestPersonaAccess, getPermittedPersonas, removePersonaAccess — exactly matching skill template"},
+    {"text": "webai.js streamCompletion has ...rest spread", "passed": true, "evidence": "webai.js has 2 occurrences of '...' spread, passing extra options including personaType through to host.request()"},
+    {"text": "App.jsx passes personaType or personaId to streamCompletion", "passed": true, "evidence": "App.jsx passes personaType: persona.id to streamCompletion in encouragement call"},
+    {"text": "Persona picker UI present in App.jsx", "passed": true, "evidence": "32 matches for persona/select/coach/motivat/strict — full persona picker with PERSONAS array, localStorage persistence, styled cards"},
+    {"text": "dist/index.html rebuilt successfully", "passed": true, "evidence": "Built clean: 206.84 kB single-file output with vite-plugin-singlefile"}
+  ],
+  "pass_rate": 1.0
+}

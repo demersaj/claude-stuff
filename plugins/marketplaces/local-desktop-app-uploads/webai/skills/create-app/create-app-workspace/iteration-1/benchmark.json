@@ -1,0 +1,185 @@
+{
+  "metadata": {
+    "skill_name": "webai:create-app",
+    "skill_path": "marketplaces/local-desktop-app-uploads/webai/skills/create-app",
+    "executor_model": "claude-sonnet-4-6",
+    "analyzer_model": "claude-sonnet-4-6",
+    "timestamp": "2026-04-08T16:00:00Z",
+    "evals_run": [0, 1, 2],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "pomodoro-timer",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "vite.config.js uses viteSingleFile plugin", "passed": true, "evidence": "vite.config.js contains viteSingleFile import and usage"},
+        {"text": "src/webai.js exists with streamCompletion", "passed": true, "evidence": "webai.js exports streamCompletion with acquire/request/finally pattern"},
+        {"text": "package.json has description field", "passed": true, "evidence": "package.json contains description field"},
+        {"text": "App.jsx has timer logic with setInterval", "passed": true, "evidence": "App.jsx uses setInterval for countdown"},
+        {"text": "App.jsx calls streamCompletion for AI encouragement", "passed": true, "evidence": "streamCompletion called on session complete"},
+        {"text": "dist/index.html was built successfully", "passed": true, "evidence": "dist/index.html exists at 200KB"},
+        {"text": "release() is called in a finally block", "passed": true, "evidence": "webai.js wraps host.request in try/finally with release()"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "pomodoro-timer",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "vite.config.js uses viteSingleFile plugin", "passed": true, "evidence": "baseline also used vite-plugin-singlefile"},
+        {"text": "webai.js created with streamCompletion", "passed": true, "evidence": "baseline created webai.js with streamCompletion"},
+        {"text": "package.json has description field", "passed": false, "evidence": "baseline did not set description in package.json"},
+        {"text": "Timer logic with setInterval", "passed": true, "evidence": "setInterval used for countdown"},
+        {"text": "AI encouragement via streamCompletion", "passed": true, "evidence": "streamCompletion called on session complete"},
+        {"text": "dist/index.html built", "passed": true, "evidence": "dist/index.html built at ~200KB"},
+        {"text": "release() in finally block", "passed": true, "evidence": "finally block present in OasisHost calls"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "daily-standup",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Three inputs for yesterday/today/blockers", "passed": true, "evidence": "App.jsx has yesterday, today, blockers state fields"},
+        {"text": "Clipboard copy implemented", "passed": true, "evidence": "navigator.clipboard used in copy handler"},
+        {"text": "Streaming output with onToken", "passed": true, "evidence": "onToken callback passed to streamCompletion"},
+        {"text": "dist/index.html built", "passed": true, "evidence": "dist/index.html at 200KB"},
+        {"text": "vite-plugin-singlefile used", "passed": true, "evidence": "vite.config.js contains viteSingleFile"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "daily-standup",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Three inputs for yesterday/today/blockers", "passed": true, "evidence": "App.jsx has three textarea fields"},
+        {"text": "Clipboard copy implemented", "passed": true, "evidence": "clipboard API used"},
+        {"text": "Streaming output with onToken", "passed": true, "evidence": "onToken present in baseline"},
+        {"text": "dist/index.html built", "passed": true, "evidence": "built successfully"},
+        {"text": "vite-plugin-singlefile used", "passed": false, "evidence": "baseline did not configure vite-plugin-singlefile; standard vite build used — app would fail to self-contain assets"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "vocab-flashcards",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Words persisted in localStorage", "passed": true, "evidence": "localStorage.getItem/setItem used for word list"},
+        {"text": "Flip/reveal interaction implemented", "passed": true, "evidence": "revealed state, .flashcard.revealed CSS, click-to-reveal UX"},
+        {"text": "Easy/hard rating implemented", "passed": true, "evidence": "Easy/Hard buttons on revealed cards"},
+        {"text": "AI generates example sentences via streamCompletion", "passed": true, "evidence": "streamCompletion called on AI button click"},
+        {"text": "dist/index.html built", "passed": true, "evidence": "dist/index.html at 168KB"},
+        {"text": "Add-word form present", "passed": true, "evidence": "Form with word/definition inputs and submit handler"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "vocab-flashcards",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Words persisted in localStorage", "passed": true, "evidence": "localStorage used"},
+        {"text": "Flip/reveal interaction", "passed": true, "evidence": "reveal pattern implemented"},
+        {"text": "Easy/hard rating", "passed": true, "evidence": "rating buttons present"},
+        {"text": "AI example sentences via streamCompletion", "passed": false, "evidence": "baseline accessed window.OasisHost directly without safe getShellAPI wrapper — will throw in dev mode"},
+        {"text": "dist/index.html built", "passed": true, "evidence": "built successfully"},
+        {"text": "Add-word form", "passed": true, "evidence": "form present"}
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 0.0, "stddev": 0.0, "min": 0.0, "max": 0.0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.830, "stddev": 0.029, "min": 0.800, "max": 0.857},
+      "time_seconds": {"mean": 0.0, "stddev": 0.0, "min": 0.0, "max": 0.0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "delta": {
+      "pass_rate": "+0.17",
+      "time_seconds": "+0.0",
+      "tokens": "+0"
+    }
+  },
+  "notes": [
+    "Key differentiators the skill adds over baseline: (1) enforces package.json description field required by Apogee launcher, (2) enforces vite-plugin-singlefile in vite.config, (3) enforces safe getShellAPI wrapper preventing crashes in dev mode, (4) standardizes webai.js with release() in finally block.",
+    "All 3 with-skill runs produced 100% pass rates. Baseline failures were distinct across evals: missing description (pomodoro), missing singlefile plugin (standup), unsafe OasisHost direct access (flashcards).",
+    "The skill is highly discriminating — baseline Claude sometimes gets most assertions right but misses at least one critical Apogee-specific requirement in every eval tested."
+  ]
+}

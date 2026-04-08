@@ -1,0 +1,46 @@
+{
+  "skill_name": "webai:update-app",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Update my pomodoro timer app at apps/pomodoro-timer/ to let me customize the session and break lengths. Add a small settings panel where I can type in how many minutes I want for work and break instead of the hardcoded 25/5. The existing timer, session counter, and AI encouragement should all still work.",
+      "expected_output": "App.jsx has input fields for custom work/break durations; timer logic uses the custom values; existing countdown, session counter, and AI encouragement still present and functional; dist/index.html rebuilt.",
+      "assertions": [
+        {
+          "name": "custom_duration_input",
+          "description": "App.jsx has an input or number field for custom duration",
+          "check": "file_contains_any",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "patterns": ["input", "workMinutes", "breakMinutes", "customDuration", "sessionLength"]
+        },
+        {
+          "name": "timer_still_present",
+          "description": "Existing setInterval timer logic is preserved",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "pattern": "setInterval"
+        },
+        {
+          "name": "ai_still_present",
+          "description": "AI encouragement via streamCompletion is preserved",
+          "check": "file_contains",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "pattern": "streamCompletion"
+        },
+        {
+          "name": "session_counter_preserved",
+          "description": "Session counter state is preserved",
+          "check": "file_contains_any",
+          "file": "apps/pomodoro-timer/src/App.jsx",
+          "patterns": ["session", "Session", "count", "Count"]
+        },
+        {
+          "name": "dist_rebuilt",
+          "description": "dist/index.html was rebuilt after changes",
+          "check": "file_exists",
+          "file": "apps/pomodoro-timer/dist/index.html"
+        }
+      ]
+    }
+  ]
+}
