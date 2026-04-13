@@ -1,8 +1,0 @@
-{
-  "name": "webai",
-  "version": "1.0.0",
-  "description": "Scaffold and upload React or Vue apps to the webAI Apogee shell",
-  "author": {
-    "name": "local"
-  }
-}

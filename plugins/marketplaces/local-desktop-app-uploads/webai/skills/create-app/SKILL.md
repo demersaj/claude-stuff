@@ -16,11 +16,11 @@ Turn a plain-English idea into a fully-working Apogee shell app — scaffolded, 
 
 Parse the argument (or ask if missing). Figure out:
 - **What the app does** — the core loop a user would go through
-- **Which shell APIs it needs** (see API reference below) — most apps need AI; some need collab or identity too
+- **Which SDK APIs it needs** (see API reference below) — most apps need `intelligence`; some need `storage`, `room`, `personas`, or `identity`
 - **App name** — derive a short `kebab-case` slug (e.g. "Pomodoro Coach" → `pomodoro-coach`)
 - **Display name** — the human-readable title shown in the Apogee launcher
 
-If the description is vague (fewer than ~10 words), ask one clarifying question before proceeding. Otherwise, proceed directly — don't ask unnecessary questions.
+If the description is vague (fewer than ~10 words), ask one clarifying question before proceeding. Otherwise, proceed directly.
 
 ## Step 2 — Scaffold
 
@@ -69,52 +69,104 @@ Patch `package.json` — set `"type": "module"` and `"description"` to the displ
 
 ## Step 3 — Write `src/webai.js`
 
-This is the integration layer between the app and the shell. Always create it — it makes API access safe in both Apogee (prod) and local dev (where all shell globals are null).
+This is the integration layer. Always create it — it provides null-safe access for both Apogee and local dev.
 
 ```javascript
-// src/webai.js — webAI Apogee shell integration helpers
+// src/webai.js — webAI Apogee SDK integration helpers
 
-const getShellAPI = (name) => window[name] ?? window.parent?.[name] ?? null;
-
-export const getOasisHost = () => getShellAPI('OasisHost');
-export const getApogeeShell = () => getShellAPI('ApogeeShell');
-export const getCollaborationManager = () => getShellAPI('CollaborationManager');
-export const getUserIdentityManager = () => getShellAPI('UserIdentityManager');
+export const getSDK = () => window.apogeeSDK || null;
 
 /** Returns 'ready' | 'loading' | 'waiting' */
-export function getOasisState() {
-  const host = getOasisHost();
-  if (!host?.getStatus) return 'waiting';
-  const s = host.getStatus();
-  if (s?.lastModel) return 'ready';
-  if (s?.loadingModel || s?.isGenerating) return 'loading';
+export function getIntelligenceState() {
+  const sdk = getSDK();
+  if (!sdk) return 'waiting';
+  const s = sdk.intelligence?.getState?.();
+  if (!s) return 'waiting';
+  if (s.isModelLoaded) return 'ready';
+  if (s.loadingModel || s.isGenerating) return 'loading';
   return 'waiting';
 }
 
-/** Stream a completion. onToken(chunk) is called for each token. */
-export async function streamCompletion(prompt, { systemPrompt = '', maxTokens = 2048, temperature = 0.7, onToken } = {}) {
-  const host = getOasisHost();
-  if (!host) throw new Error('OasisHost not available — is the Apogee shell running?');
-  const release = await host.acquire({ warmRuntime: true });
-  try {
-    return await host.request(prompt, { systemPrompt, maxTokens, temperature, onToken });
-  } finally {
-    release?.();
+/**
+ * Subscribe to intelligence state changes.
+ * Returns an unsubscribe function — call it on unmount.
+ */
+export function onIntelligenceChange(handler) {
+  const sdk = getSDK();
+  if (!sdk) return () => {};
+  return sdk.intelligence.subscribe(handler);
+}
+
+/**
+ * Stream a chat completion. onToken(delta) is called for each token.
+ * Returns the full accumulated text.
+ */
+export async function streamCompletion(prompt, {
+  systemPrompt = '',
+  maxTokens = 2048,
+  temperature = 0.7,
+  model = 'auto',
+  onToken,
+  priorMessages = [],
+  ...rest
+} = {}) {
+  const sdk = getSDK();
+  if (!sdk) throw new Error('apogeeSDK not available — is the Apogee shell running?');
+
+  const messages = [];
+  if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+  for (const m of priorMessages) messages.push(m);
+  messages.push({ role: 'user', content: prompt });
+
+  let fullText = '';
+  const stream = sdk.intelligence.chatCompletionStream({
+    model, messages, max_tokens: maxTokens, temperature, ...rest
+  });
+  for await (const chunk of stream) {
+    if (chunk.delta) {
+      fullText += chunk.delta;
+      onToken?.(chunk.delta);
+    }
   }
+  return fullText;
+}
+
+/** Cancel any in-progress generation. */
+export function cancelGeneration() {
+  getSDK()?.intelligence?.cancelGeneration?.();
 }
 
 /** Navigate back to the Apogee launcher. */
 export function goToLauncher() {
-  const shell = getApogeeShell();
-  if (shell?.setView) shell.setView('launcher');
-  else if (typeof window.backToLauncher === 'function') window.backToLauncher();
+  const sdk = getSDK();
+  if (sdk?.shell?.setView) sdk.shell.setView('launcher');
   else window.parent?.postMessage({ type: 'backToLauncher' }, '*');
 }
 ```
 
-Only export additional helpers (collaboration, identity) if the app actually needs them.
+Only add additional exports (storage, room, identity) if the app actually needs them.
 
-## Step 4 — Implement the app
+## Step 4 — Add the shell manifest to `index.html`
+
+The Apogee shell parses the manifest before injecting the SDK. Add it as the first `<script>` in `<head>`:
+
+```html
+<script type="application/apogee-shell-manifest+json" id="apogee-shell-manifest">
+{
+  "schemaVersion": 1,
+  "name": "<Display Name>",
+  "version": "1.0.0",
+  "provides": { "hasOwnRouting": true },
+  "requires": {
+    "managers": ["shell", "intelligence"]
+  }
+}
+</script>
+```
+
+Add only the managers the app actually uses. Common additions: `"storage"` (persistence), `"room"` (collaboration), `"personas"` (persona support), `"identity"` (user info).
+
+## Step 5 — Implement the app
 
 Replace the boilerplate `src/App.jsx` with a **real, working implementation** based on the description. This is the most important step — the goal is that when the user refreshes Apogee, they see a functional app, not a skeleton.
 
@@ -122,25 +174,24 @@ Replace the boilerplate `src/App.jsx` with a **real, working implementation** ba
 
 **Header** — a thin bar at the top with:
 - App title (left)
-- AI status badge: a small colored dot + label (`● ready` / `◌ loading…` / `○ waiting`) driven by polling `getOasisState()` every 1200ms
+- AI status badge: a small colored dot + label (`● ready` / `◌ loading…` / `○ waiting`) driven by subscribing to `onIntelligenceChange`
 - Back button (right): `← Launcher` that calls `goToLauncher()`
 
-**Shell-aware dev mode notice** — when `getOasisHost()` returns null, show a subtle banner: `"Running outside Apogee — AI features disabled"`. This lets the app work on `npm run dev` without crashing.
+**SDK dev mode notice** — when `getSDK()` returns null, show a subtle banner: `"Running outside Apogee — AI features disabled"`. This lets the app work on `npm run dev` without crashing.
 
-**Oasis state polling** — always wire this up, even if AI isn't immediately visible in the UI, so the status badge works:
+**Intelligence state subscription** — always wire this up so the status badge works:
 
 ```jsx
-const [oasisState, setOasisState] = useState('waiting');
+const [intelligenceState, setIntelligenceState] = useState('waiting');
 useEffect(() => {
-  const id = setInterval(() => setOasisState(getOasisState()), 1200);
-  setOasisState(getOasisState());
-  return () => clearInterval(id);
+  setIntelligenceState(getIntelligenceState());
+  return onIntelligenceChange(() => setIntelligenceState(getIntelligenceState()));
 }, []);
 ```
 
 ### AI streaming pattern
 
-For any AI generation, stream tokens into state as they arrive so the UI feels responsive:
+For any AI generation, stream tokens into state as they arrive:
 
 ```jsx
 const [output, setOutput] = useState('');
@@ -164,7 +215,7 @@ async function generate(prompt) {
 
 ### CSS approach
 
-Inline a `<style>` block or use a separate `src/App.css` with CSS custom properties. Dark mode support is expected — use `@media (prefers-color-scheme: dark)` or a data attribute toggle. Keep it clean and minimal; Apogee apps run in a constrained iframe.
+Inline a `<style>` block or use a separate `src/App.css` with CSS custom properties. Always support both themes using the `data-theme` attribute (Apogee sets this on `<html>`):
 
 ```css
 :root {
@@ -174,8 +225,10 @@ Inline a `<style>` block or use a separate `src/App.css` with CSS custom propert
   --accent: #2563eb;
   --radius: 8px;
 }
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #0f0f0f; --surface: #1a1a1a; --text: #f0f0f0; }
+[data-theme="dark"] {
+  --bg: #181818;
+  --surface: #262626;
+  --text: #fafafa;
 }
 ```
 
@@ -185,21 +238,20 @@ Think about what the user actually wants to do in this app. Don't just add a tex
 - A **Pomodoro timer** needs a prominent countdown, start/stop/reset, session counter, and an AI "coach" panel for encouragement
 - A **Kanban board** needs columns, draggable cards, an add-card flow, and an AI suggestion per card
 - A **Writing assistant** needs an editor area, a prompt form, and a streaming response panel beside it
-- A **Flashcard app** needs card display, flip animation, difficulty rating, and an AI "explain this" button
 
-Implement the core loop fully. It's fine to stub out secondary features with a TODO comment, but the primary value of the app must work end to end.
+Implement the core loop fully. Stub secondary features with a TODO comment, but the primary value of the app must work end to end.
 
-## Step 5 — Build
+## Step 6 — Build
 
 ```bash
 npm run build
 ```
 
-Verify `dist/index.html` exists and is a single self-contained file (no external URLs in script/link tags). If the build fails, read the error, fix it, and rebuild — don't give up after one failure.
+Verify `dist/index.html` exists and is a single self-contained file. If the build fails, read the error, fix it, and rebuild.
 
 Show the file size: `du -sh dist/index.html`. Warn the user if it's over 5 MB.
 
-## Step 6 — Upload
+## Step 7 — Upload
 
 ```bash
 node ../../scripts/upload.js
@@ -207,7 +259,7 @@ node ../../scripts/upload.js
 
 The script POSTs to `http://127.0.0.1:44280/install` (Tauri local server). If the Tauri app is running, the app installs directly. If not, it prints a DevTools paste script.
 
-## Step 7 — Report
+## Step 8 — Report
 
 ```
 ✅ Built: dist/index.html (XXX KB)
@@ -227,28 +279,50 @@ To rebuild and re-upload after changes:
 
 ## Shell API reference
 
-| API | Access | Use for |
-|-----|--------|---------|
-| `OasisHost` | `getOasisHost()` | AI inference, streaming |
-| `ApogeeShell` | `getApogeeShell()` | Navigation between views |
-| `CollaborationManager` | `getCollaborationManager()` | P2P rooms, CRDT, real-time sync |
-| `UserIdentityManager` | `getUserIdentityManager()` | User display name, avatar, ODID |
+| API | Access | Manager | Use for |
+|-----|--------|---------|---------|
+| AI inference | `sdk.intelligence` | `intelligence` | Chat, streaming, state |
+| App storage | `sdk.storage` | `storage` | Persistent key/value data |
+| Navigation | `sdk.shell` | `shell` | Views, launcher, apps |
+| Collaboration | `sdk.room` | `room` | P2P rooms, user presence |
+| Personas | `sdk.personas` | `personas` | AI persona selection |
+| Identity | `sdk.identity` | `identity` | User profile, auth |
+| Theme | `sdk.theme` | `theme` | Dark/light mode |
+| Messaging | `sdk.messaging` | `messaging` | Conversations, AI threads |
 
 Only import and use the APIs the app actually needs. If the description says nothing about collaboration or identity, don't wire those in.
 
-### CollaborationManager quick reference (only if needed)
+### Storage quick reference (for state persistence)
+
+Values must be strings — JSON-serialize objects before saving.
+
 ```javascript
-const collab = getCollaborationManager();
-const room = await collab.createRoom('my-room-name');    // returns { roomId, joinCode }
-await collab.joinRoom(joinCode);
-collab.onMessage((roomId, data) => { /* handle */ });
-await collab.sendMessage(roomId, { type: 'update', payload });
+const sdk = getSDK();
+if (sdk) {
+  await sdk.storage.set('my-key', JSON.stringify({ data: 'value' }));
+  const raw = await sdk.storage.get('my-key');   // string | null
+  const obj = raw ? JSON.parse(raw) : null;
+  await sdk.storage.delete('my-key');
+  const keys = await sdk.storage.list();          // string[]
+}
 ```
 
-### UserIdentityManager quick reference (only if needed)
+### Room quick reference (only if collaboration needed)
+
 ```javascript
-const identity = getUserIdentityManager();
-const me = await identity.getOrCreateIdentity();  // { displayName, avatarUrl, odid }
+import { getSDK } from './webai.js';
+const sdk = getSDK();
+const roomCode = await sdk.room.host({ userName: 'Alice' });
+await sdk.room.join({ roomCode, userName: 'Bob' });
+sdk.room.disconnect();
+const unsub = sdk.room.subscribe((event) => { /* handle state change */ });
+```
+
+### Identity quick reference (only if needed)
+
+```javascript
+const sdk = getSDK();
+const user = sdk?.identity?.getState?.(); // { displayName, peerId, odid }
 ```
 
 ---
@@ -256,7 +330,8 @@ const me = await identity.getOrCreateIdentity();  // { displayName, avatarUrl, o
 ## Common mistakes to avoid
 
 - **Placeholder UI**: Don't ship `<h1>Welcome to {name}</h1>` with a text area and submit button as the whole app. Build the actual thing.
-- **Missing release()**: Always call `release()` in a `finally` block after `host.acquire()`, or you'll lock the AI runtime.
-- **Assuming shell APIs exist**: Always use `getOasisHost()` etc. from `webai.js` — never access `window.OasisHost` directly. The null-safety matters for local dev.
+- **Missing manifest**: Every app needs `<script type="application/apogee-shell-manifest+json">` — without it, the SDK may not inject the managers you need.
+- **Using old window globals**: Never access `window.OasisHost`, `window.ApogeeShell`, or `window.CollaborationManager` directly. The current API is `window.apogeeSDK`. Always use `getSDK()` from `webai.js`.
 - **External dependencies at runtime**: The built `dist/index.html` must be fully self-contained. No CDN links, no relative asset paths. `vite-plugin-singlefile` handles this if configured correctly.
 - **Forgetting `"description"` in package.json**: The Apogee launcher uses this as the app's display name. Don't leave it as the default.
+- **Forgetting to declare managers**: If `"storage"` isn't listed in the manifest, `sdk.storage` won't be available at runtime even though `sdk` exists.

@@ -1,238 +1,118 @@
 ---
 name: add-collab
-description: Add CollaborationManager (P2P rooms, CRDT state sync, presence, chat, voice, file sharing) wiring to an existing webAI app
+description: Add sdk.room (P2P rooms, user presence, chat) wiring to an existing webAI app
 argument-hint: "[component-or-file-path]"
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
 # webAI Add Collaboration
 
-Add real-time P2P collaboration via CollaborationManager to a webAI app.
+Add real-time P2P collaboration via `sdk.room` to a webAI app.
 
-## What CollaborationManager provides
-
-CollaborationManager is a full P2P collaboration layer injected by Apogee. Apps can use as little or as much as needed:
+## What sdk.room provides
 
 | Feature | Key methods | Good for |
 |---------|-------------|----------|
-| **Room** | `hostRoom`, `joinRoom`, `leaveRoom` | Any multi-user app |
-| **CRDT state** | `updateField`, `getState`, `requestLock` | Shared documents, whiteboards, kanban |
-| **Presence** | `getUsers`, `getPresenceMap` | Showing who's online, cursors |
-| **Events** | `addListener(type, fn)` | Reacting to any of the above |
-| **Chat** | `sendChatMessage`, `sendDirectMessage` | In-app messaging |
-| **Voice** | `joinVoice`, `toggleMute` | Audio rooms |
-| **Files** | `shareFile`, `getSharedFiles` | Asset/document sharing |
-| **Crypto** | `window.E2ECrypto.encrypt/decrypt` | Encrypted DMs |
+| **Room** | `host`, `join`, `disconnect` | Any multi-user app |
+| **State** | `getState` | Room metadata, connection status |
+| **Presence** | `getUsers` | Showing who's online |
+| **Discovery** | `listPublicRooms` | Browsing available rooms |
+| **Events** | `subscribe` | Reacting to all room changes |
+| **Chat** | `sendChatMessage` | In-room text messages |
 
 ## Process
 
 1. **Read the target file** (provided as argument, or ask). Understand what the app does — this determines which collaboration features make sense.
 
-2. **Create `src/collab.js`** — a null-safe wrapper. Include only the sections relevant to what the app needs. The full template is below; trim unused sections.
+2. **Check the shell manifest** in `index.html` — ensure `"room"` (and `"identity"` if showing user names) are listed in `requires.managers`. Add them if missing.
 
-3. **Wire the target component** with the patterns below, adapting to what the app actually needs.
+3. **Create `src/collab.js`** — a null-safe wrapper. Include only the sections relevant to what the app needs.
 
-4. **Remind the user** that CollaborationManager is only injected when running inside Apogee. In local dev it's null — the helpers handle this gracefully.
+4. **Wire the target component** with the patterns below, adapting to what the app actually needs.
+
+5. **Remind the user** that `sdk.room` is only available when running inside Apogee with the `"room"` manager declared. In local dev it's null — the helpers handle this gracefully.
 
 ---
 
 ## `src/collab.js` template
 
 ```javascript
-// src/collab.js — webAI CollaborationManager & E2ECrypto helpers
+// src/collab.js — webAI room collaboration helpers via apogeeSDK
 // Trim unused sections for your app.
 
-const getCollab = () =>
-  window.CollaborationManager ?? window.parent?.CollaborationManager ?? null;
-
-const getCrypto = () =>
-  window.E2ECrypto ?? window.parent?.E2ECrypto ?? null;
+const getSDK = () => window.apogeeSDK || null;
 
 // ── Room ─────────────────────────────────────────────────────────────────────
 
 /**
  * Host a new collaboration room.
- * @param {string} roomCode - Short code peers use to join (e.g. "abc-123")
- * @param {object} [settings] - Optional: { roomName, password, isPublic }
- * @returns {Promise<object|null>} Room state or null if unavailable
+ * @param {object} opts - { userName?, options? }
+ * @returns {Promise<string|null>} Room code (short join code) or null if unavailable
  */
-export async function hostRoom(roomCode, settings = {}) {
-  const collab = getCollab();
-  if (!collab) { console.warn('[collab] CollaborationManager not available'); return null; }
-  return collab.hostRoom(roomCode, settings);
+export async function hostRoom(opts = {}) {
+  const sdk = getSDK();
+  if (!sdk?.room) { console.warn('[collab] sdk.room not available'); return null; }
+  return sdk.room.host(opts);
 }
 
 /**
  * Join an existing room by code.
  * @param {string} roomCode
- * @param {string} [password]
+ * @param {object} opts - { userName?, password?, hostPeerId? }
  */
-export async function joinRoom(roomCode, password = null) {
-  const collab = getCollab();
-  if (!collab) return null;
-  return collab.joinRoom(roomCode, password);
+export async function joinRoom(roomCode, opts = {}) {
+  const sdk = getSDK();
+  if (!sdk?.room) return null;
+  return sdk.room.join({ roomCode, ...opts });
 }
 
-export function leaveRoom() {
-  getCollab()?.leaveRoom?.();
+export function disconnectRoom() {
+  getSDK()?.room?.disconnect?.();
 }
 
-export function getRoomSettings() {
-  return getCollab()?.getRoomSettings?.() ?? null;
-}
+// ── State & Presence ──────────────────────────────────────────────────────────
 
-/** true when connected to a room */
-export function isConnected() {
-  return getCollab()?.isConnected ?? false;
+/** Returns current ApogeeRoomState or null */
+export function getRoomState() {
+  return getSDK()?.room?.getState?.() ?? null;
 }
-
-// ── Presence & Users ─────────────────────────────────────────────────────────
 
 /** Returns array of connected users */
-export function getUsers() {
-  return getCollab()?.getUsers?.() ?? [];
+export function getRoomUsers() {
+  return getSDK()?.room?.getUsers?.() ?? [];
 }
 
-/** Returns presence map: { [odid]: { displayName, appId, ... } } */
-export function getPresenceMap() {
-  return getCollab()?.getPresenceMap?.() ?? {};
-}
-
-/** Returns users currently in a specific app (by sourceId) */
-export function getUsersInApp(appSourceId) {
-  return getCollab()?.getUsersInApp?.(appSourceId) ?? [];
-}
-
-// ── CRDT State Sync ───────────────────────────────────────────────────────────
-// CRDT fields are key-value pairs broadcast to all peers instantly.
-// Use requestLock before editing to prevent conflicts in competitive scenarios.
-
-/** Broadcast a field update to all peers */
-export function updateField(key, value) {
-  getCollab()?.updateField?.(key, value);
-}
-
-/** Get the current shared state snapshot */
-export function getState() {
-  return getCollab()?.getState?.() ?? {};
-}
-
-/**
- * Request an exclusive edit lock on a field.
- * Returns a promise that resolves to true (lock granted) or false (denied).
- */
-export async function requestLock(fieldKey) {
-  const collab = getCollab();
-  if (!collab) return false;
-  return collab.requestLock(fieldKey);
-}
-
-export function releaseLock(fieldKey) {
-  getCollab()?.releaseLock?.(fieldKey);
-}
-
-export function isFieldLocked(fieldKey) {
-  return getCollab()?.isFieldLocked?.(fieldKey) ?? false;
+/** Returns list of public rooms: [{ roomCode, roomName, userCount, isPublic, requiresPassword }] */
+export function listPublicRooms() {
+  return getSDK()?.room?.listPublicRooms?.() ?? [];
 }
 
 // ── Events ────────────────────────────────────────────────────────────────────
-// Subscribe to collaboration events. Always call the returned cleanup fn on unmount.
+// Subscribe to all room state changes.
+// The handler receives ApogeeFacadeEvent<string, ApogeeRoomState>.
+// Common event.type values: 'connected', 'disconnected', 'state', 'users'
 //
-// Event types:
-//   'connected'      — joined a room
-//   'disconnected'   — left/lost room
-//   'userJoined'     — { user } a peer arrived
-//   'userLeft'       — { user } a peer left
-//   'usersUpdated'   — full user list changed
-//   'stateUpdated'   — { state } CRDT state changed
-//   'chatMessage'    — { message } chat received
-//   'voiceJoined'    — { user } someone joined voice
-//   'voiceLeft'      — { user } someone left voice
-//   'lockAcquired'   — { fieldKey } lock granted
-//   'lockDenied'     — { fieldKey } lock denied
-//   'lockReleased'   — { fieldKey } lock released
+// Returns an unsubscribe function — call it on unmount.
 
-/**
- * Subscribe to a collaboration event.
- * @returns {function} cleanup function — call on unmount
- */
-export function onCollabEvent(eventType, handler) {
-  const collab = getCollab();
-  if (!collab) return () => {};
-  collab.addListener(eventType, handler);
-  return () => collab.removeListener(handler);
+export function onRoomEvent(handler) {
+  const sdk = getSDK();
+  if (!sdk?.room) return () => {};
+  return sdk.room.subscribe(handler);
 }
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
 
 export function sendChatMessage(text) {
-  getCollab()?.sendChatMessage?.(text);
+  getSDK()?.room?.sendChatMessage?.(text);
 }
 
-/** Send an encrypted direct message to a specific user (by odid) */
-export async function sendDirectMessage(toOdid, text) {
-  const collab = getCollab();
-  if (!collab) return;
-  return collab.sendDirectMessage(toOdid, text);
-}
+// ── Identity ─────────────────────────────────────────────────────────────────
 
-export function sendTypingIndicator(isTyping, dmToOdid = null) {
-  getCollab()?.sendTypingIndicator?.(isTyping, dmToOdid);
-}
-
-// ── Voice ─────────────────────────────────────────────────────────────────────
-
-export async function joinVoice() {
-  return getCollab()?.joinVoice?.();
-}
-
-export function leaveVoice() {
-  getCollab()?.leaveVoice?.();
-}
-
-export function toggleMute() {
-  getCollab()?.toggleMute?.();
-}
-
-export function getVoiceParticipants() {
-  return getCollab()?.getVoiceParticipants?.() ?? [];
-}
-
-// ── File Sharing ──────────────────────────────────────────────────────────────
-
-/** Share a File object with everyone in the room */
-export async function shareFile(file) {
-  return getCollab()?.shareFile?.(file);
-}
-
-export function getSharedFiles() {
-  return getCollab()?.getSharedFiles?.() ?? [];
-}
-
-export async function requestFile(fileId) {
-  return getCollab()?.requestFile?.(fileId);
-}
-
-// ── Identity & Crypto ─────────────────────────────────────────────────────────
-
-export async function getIdentity() {
-  const im = window.UserIdentityManager ?? window.parent?.UserIdentityManager;
-  if (!im) return { odid: 'local', displayName: 'You', profileImage: null };
-  return im.getOrCreateIdentity();
-}
-
-/** Encrypt a string for a specific recipient (using their public key JWK) */
-export async function encryptFor(text, recipientPublicKeyJwk) {
-  const crypto = getCrypto();
-  if (!crypto) throw new Error('E2ECrypto not available');
-  return crypto.encrypt(text, recipientPublicKeyJwk);
-}
-
-/** Decrypt a string using the local user's private key */
-export async function decrypt(encryptedBase64, privateKeyJwk) {
-  const crypto = getCrypto();
-  if (!crypto) throw new Error('E2ECrypto not available');
-  return crypto.decrypt(encryptedBase64, privateKeyJwk);
+/** Returns the local user's identity state or a fallback for dev mode */
+export function getIdentity() {
+  const sdk = getSDK();
+  if (!sdk?.identity) return { displayName: 'You', peerId: 'local', odid: null };
+  return sdk.identity.getState();
 }
 ```
 
@@ -240,55 +120,63 @@ export async function decrypt(encryptedBase64, privateKeyJwk) {
 
 ## React wiring patterns
 
-### Basic room + CRDT (most common)
+### Basic room + presence (most common)
 
 ```jsx
-import { hostRoom, joinRoom, leaveRoom, updateField, getState, onCollabEvent, getUsers, isConnected } from './collab.js';
+import { hostRoom, joinRoom, disconnectRoom, getRoomState, getRoomUsers, onRoomEvent, listPublicRooms } from './collab.js';
 
 const [roomCode, setRoomCode] = useState('');
 const [connected, setConnected] = useState(false);
 const [users, setUsers] = useState([]);
-const [sharedState, setSharedState] = useState({});
+const [publicRooms, setPublicRooms] = useState([]);
 
 useEffect(() => {
-  const cleanups = [
-    onCollabEvent('connected', () => setConnected(true)),
-    onCollabEvent('disconnected', () => { setConnected(false); setUsers([]); }),
-    onCollabEvent('usersUpdated', ({ users }) => setUsers(users)),
-    onCollabEvent('stateUpdated', ({ state }) => setSharedState(state)),
-  ];
-  return () => cleanups.forEach(fn => fn());
+  // Load public rooms on mount
+  setPublicRooms(listPublicRooms());
+
+  // Subscribe to all room events
+  const unsub = onRoomEvent((event) => {
+    const state = getRoomState();
+    setConnected(!!state?.connected);
+    setUsers(getRoomUsers());
+    // Refresh public rooms list on disconnect
+    if (event.type === 'disconnected') setPublicRooms(listPublicRooms());
+  });
+  return unsub;
 }, []);
 
 async function handleHost() {
-  const code = Math.random().toString(36).slice(2, 8); // or let user pick
-  await hostRoom(code, { roomName: 'My Room' });
-  setRoomCode(code);
+  const code = await hostRoom({ userName: getIdentity().displayName });
+  if (code) setRoomCode(code);
 }
 
 async function handleJoin(code) {
-  await joinRoom(code);
+  await joinRoom(code, { userName: getIdentity().displayName });
   setRoomCode(code);
-  setSharedState(getState()); // sync current state on join
 }
 
-// To sync a piece of state to all peers:
-function handleChange(key, value) {
-  setSharedState(prev => ({ ...prev, [key]: value }));
-  updateField(key, value); // broadcasts to everyone
+function handleLeave() {
+  disconnectRoom();
+  setRoomCode('');
 }
 ```
 
 ### Chat
 
 ```jsx
+import { sendChatMessage, onRoomEvent } from './collab.js';
+
 const [messages, setMessages] = useState([]);
 const [draft, setDraft] = useState('');
 
 useEffect(() => {
-  return onCollabEvent('chatMessage', ({ message }) =>
-    setMessages(prev => [...prev, message])
-  );
+  return onRoomEvent((event) => {
+    // Chat messages arrive as a state event — check the room state for new messages
+    // or look for event.type === 'chat' depending on platform version
+    if (event.type === 'chat' && event.data?.text) {
+      setMessages(prev => [...prev, { text: event.data.text, from: event.data.from }]);
+    }
+  });
 }, []);
 
 function handleSend() {
@@ -298,25 +186,26 @@ function handleSend() {
 }
 ```
 
-### Voice
+### Showing connected users
 
 ```jsx
-const [inVoice, setInVoice] = useState(false);
-const [muted, setMuted] = useState(false);
-
-async function handleVoiceToggle() {
-  if (inVoice) { leaveVoice(); setInVoice(false); }
-  else { await joinVoice(); setInVoice(true); }
-}
+<div className="users">
+  {users.map((user, i) => (
+    <div key={user.peerId ?? i} className="user">
+      <span className="user-dot" />
+      {user.displayName ?? user.userName ?? 'Anonymous'}
+    </div>
+  ))}
+</div>
 ```
 
 ---
 
 ## Rules
 
-- Always wrap CollaborationManager calls with the null guards in `collab.js` — it's null in local dev and Apogee provides it at runtime.
-- Trim `collab.js` to only the features the app actually uses — don't ship the full template if the app only needs rooms and CRDT.
-- Always return the `onCollabEvent` cleanup and call it on unmount to avoid listener leaks.
-- Use `roomCode` (a short joinable code) as the first arg to `hostRoom`, not a display name — the display name goes in settings.
-- For competitive editing (two users editing the same field), use `requestLock`/`releaseLock`. For append-only data (chat, activity logs), just `updateField` directly.
+- Always wrap `sdk.room` calls with the null guard in `collab.js` — it's null in local dev and when `"room"` isn't in the manifest.
+- Always declare `"room"` in the manifest `requires.managers` — without it, `sdk.room` won't be injected even when running in Apogee.
+- Trim `collab.js` to only the features the app actually uses — don't ship the full template if the app only needs `host/join`.
+- Always return the `onRoomEvent` unsubscribe and call it on unmount to avoid listener leaks.
+- The `roomCode` returned by `sdk.room.host()` is the short string peers use to join — show it to the user so they can share it.
 - Never expose room passwords in the UI or localStorage.

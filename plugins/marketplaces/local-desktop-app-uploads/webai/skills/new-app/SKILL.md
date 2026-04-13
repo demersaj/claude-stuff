@@ -11,7 +11,7 @@ Scaffold a new app for the webAI Apogee shell.
 
 ## Process
 
-1. **Parse arguments** - Get app name, framework, and optional description from the user's input (e.g. `/webai:new-app my-tool react --description "A kanban board with AI task suggestions"`). If framework is not specified, ask the user to choose between React and Vue. If `--description` is provided, capture it for use in steps 5 and 8.
+1. **Parse arguments** - Get app name, framework, and optional description from the user's input (e.g. `/webai:new-app my-tool react --description "A kanban board with AI task suggestions"`). If framework is not specified, ask the user to choose between React and Vue. If `--description` is provided, capture it for use in steps 5 and 9.
 
 2. **Read the webai-app skill** to understand the constraints and APIs before generating any code.
 
@@ -41,106 +41,96 @@ Scaffold a new app for the webAI Apogee shell.
 
    export default defineConfig({
      plugins: [react(), viteSingleFile()],
-     build: { outDir: 'dist' },
+     build: {
+       target: 'esnext',
+       assetsInlineLimit: 100000000,
+       cssCodeSplit: false,
+     },
    });
    ```
 
-5. **Create `src/webai.js`** - shell API helpers:
+5. **Add the shell manifest to `index.html`** — insert as the first `<script>` in `<head>`:
+   ```html
+   <script type="application/apogee-shell-manifest+json" id="apogee-shell-manifest">
+   {
+     "schemaVersion": 1,
+     "name": "<Display Name>",
+     "version": "1.0.0",
+     "provides": { "hasOwnRouting": true },
+     "requires": {
+       "managers": ["shell", "intelligence"]
+     }
+   }
+   </script>
+   ```
+   Add more managers as needed: `"storage"`, `"room"`, `"personas"`, `"identity"`, `"theme"`.
+
+6. **Create `src/webai.js`** - SDK integration layer:
    ```javascript
-   // src/webai.js - webAI shell integration helpers
-   export const getShellAPI = (name) =>
-     window[name] ?? window.parent?.[name] ?? null;
+   // src/webai.js — webAI Apogee SDK integration helpers
 
-   export const getOasisHost = () => getShellAPI('OasisHost');
-   export const getApogeeShell = () => getShellAPI('ApogeeShell');
-   export const getCollaborationManager = () => getShellAPI('CollaborationManager');
-   export const getUserIdentityManager = () => getShellAPI('UserIdentityManager');
+   export const getSDK = () => window.apogeeSDK || null;
 
-   export function getOasisState() {
-     const host = getOasisHost();
-     if (!host?.getStatus) return 'waiting';
-     const s = host.getStatus();
-     if (s?.lastModel) return 'ready';
-     if (s?.loadingModel || s?.isGenerating) return 'loading';
+   /** Returns 'ready' | 'loading' | 'waiting' */
+   export function getIntelligenceState() {
+     const sdk = getSDK();
+     if (!sdk) return 'waiting';
+     const s = sdk.intelligence?.getState?.();
+     if (!s) return 'waiting';
+     if (s.isModelLoaded) return 'ready';
+     if (s.loadingModel || s.isGenerating) return 'loading';
      return 'waiting';
    }
 
-   export async function streamCompletion(prompt, systemPrompt, onToken) {
-     const host = getOasisHost();
-     if (!host) throw new Error('Oasis AI not available in this environment.');
-     const release = await host.acquire({ warmRuntime: true });
-     try {
-       return await host.request(prompt, {
-         systemPrompt: systemPrompt ?? '',
-         maxTokens: 2048,
-         temperature: 0.7,
-         onToken,
-       });
-     } finally {
-       if (release) release();
-     }
+   /** Subscribe to intelligence state changes. Returns unsubscribe fn. */
+   export function onIntelligenceChange(handler) {
+     const sdk = getSDK();
+     if (!sdk) return () => {};
+     return sdk.intelligence.subscribe(handler);
    }
 
+   /** Stream a completion. onToken(delta) called for each token. */
+   export async function streamCompletion(prompt, {
+     systemPrompt = '',
+     maxTokens = 2048,
+     temperature = 0.7,
+     model = 'auto',
+     onToken,
+     priorMessages = [],
+     ...rest
+   } = {}) {
+     const sdk = getSDK();
+     if (!sdk) throw new Error('apogeeSDK not available — is the Apogee shell running?');
+
+     const messages = [];
+     if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+     for (const m of priorMessages) messages.push(m);
+     messages.push({ role: 'user', content: prompt });
+
+     let fullText = '';
+     const stream = sdk.intelligence.chatCompletionStream({
+       model, messages, max_tokens: maxTokens, temperature, ...rest
+     });
+     for await (const chunk of stream) {
+       if (chunk.delta) {
+         fullText += chunk.delta;
+         onToken?.(chunk.delta);
+       }
+     }
+     return fullText;
+   }
+
+   /** Cancel any in-progress generation. */
+   export function cancelGeneration() {
+     getSDK()?.intelligence?.cancelGeneration?.();
+   }
+
+   /** Navigate back to the Apogee launcher. */
    export function goToLauncher() {
-     if (typeof window.backToLauncher === 'function') {
-       window.backToLauncher();
-     } else {
-       const shell = getApogeeShell();
-       if (shell?.setView) shell.setView('launcher');
-       else window.parent?.postMessage({ type: 'backToLauncher' }, '*');
-     }
+     const sdk = getSDK();
+     if (sdk?.shell?.setView) sdk.shell.setView('launcher');
+     else window.parent?.postMessage({ type: 'backToLauncher' }, '*');
    }
-   ```
-
-6. **Create `scripts/upload.js`** - upload helper:
-   ```javascript
-   #!/usr/bin/env node
-   // scripts/upload.js
-   // Run: node scripts/upload.js
-   // Then paste the output into the browser console on your Apogee shell page.
-   import { readFileSync } from 'fs';
-   import { resolve } from 'path';
-
-   const htmlPath = resolve('./dist/index.html');
-   let html;
-   try {
-     html = readFileSync(htmlPath, 'utf8');
-   } catch {
-     console.error('dist/index.html not found. Run `npm run build` first.');
-     process.exit(1);
-   }
-
-   // Read app metadata from package.json
-   const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
-   const appId = pkg.name;
-   const displayName = pkg.description || pkg.name;
-
-   const uploadScript = `
-   (async function uploadToApogee() {
-     const htmlContent = ${JSON.stringify(html)};
-     const appId = ${JSON.stringify(appId)};
-     const displayName = ${JSON.stringify(displayName)};
-
-     const hashBuffer = await crypto.subtle.digest(
-       'SHA-256',
-       new TextEncoder().encode(htmlContent.replace(/\\s+/g, ' ').replace(/<!--[\\s\\S]*?-->/g, ''))
-     );
-     const sourceId = Array.from(new Uint8Array(hashBuffer))
-       .map(b => b.toString(16).padStart(2, '0')).join('');
-
-     const stored = JSON.parse(localStorage.getItem('apogee-uploaded-apps') || '[]');
-     const filtered = stored.filter(app => app.appId !== appId);
-     filtered.push({ appId, displayName, htmlContent, sourceId, uploadedAt: Date.now(), version: 1 });
-     localStorage.setItem('apogee-uploaded-apps', JSON.stringify(filtered));
-
-     console.log('[webAI] Uploaded: ' + displayName + ' (' + appId + ')');
-     console.log('[webAI] Refresh the Apogee launcher to see your app.');
-   })();
-   `.trim();
-
-   console.log('=== Paste this in your browser console on the Apogee shell page ===\n');
-   console.log(uploadScript);
-   console.log('\n=== End of script ===');
    ```
 
 7. **Add npm scripts** to `package.json`:
@@ -150,20 +140,30 @@ Scaffold a new app for the webAI Apogee shell.
        "dev": "vite",
        "build": "vite build",
        "preview": "vite preview",
-       "upload": "node scripts/upload.js"
+       "upload": "node ../../scripts/upload.js"
      }
    }
    ```
 
-   Also set `"description"` in `package.json` to the value provided via `--description` (or a sensible default derived from the app name if none was given). This is picked up automatically by the build-upload skill.
+   Also set `"description"` in `package.json` to the value provided via `--description` (or a sensible default derived from the app name). This is picked up automatically by the build-upload skill.
 
 8. **Replace boilerplate** in `src/App.jsx` (React) or `src/App.vue` (Vue) with a webAI-ready starter that:
-   - Imports from `./webai.js`
-   - Polls `getOasisState()` every 1.2s and shows AI status in the header
+   - Imports `getSDK`, `getIntelligenceState`, `onIntelligenceChange`, `goToLauncher` from `./webai.js`
+   - Subscribes to intelligence state changes on mount (not polling — uses `onIntelligenceChange`)
+   - Shows AI status badge in the header
    - Has a back-to-launcher button
-   - Shows a "Not running in Apogee" notice in dev mode (when shell APIs are null)
-   - **If `--description` was provided**: generate a meaningful initial UI and logic that reflects what the app is supposed to do - real components, real state, real layout - not a generic placeholder. Use the description to inform the component structure, copy, and any AI prompts passed to `streamCompletion`.
+   - Shows a "Not running in Apogee" notice in dev mode (when `getSDK()` returns null)
+   - **If `--description` was provided**: generate a meaningful initial UI and logic that reflects what the app is supposed to do — real components, real state, real layout — not a generic placeholder.
    - **If no description**: use a minimal placeholder main content area.
+
+   **React intelligence state pattern (subscribe, not polling):**
+   ```jsx
+   const [intelligenceState, setIntelligenceState] = useState('waiting');
+   useEffect(() => {
+     setIntelligenceState(getIntelligenceState());
+     return onIntelligenceChange(() => setIntelligenceState(getIntelligenceState()));
+   }, []);
+   ```
 
 9. **Print next steps** for the user:
    ```
@@ -181,8 +181,11 @@ Scaffold a new app for the webAI Apogee shell.
 ## Rules
 
 - Always use `vite-plugin-singlefile` - this is non-negotiable for Apogee compatibility.
-- Always create `src/webai.js` as the integration layer.
-- Never hardcode app IDs - derive from `package.json` name.
-- Always set `"description"` in `package.json` - use the `--description` value if provided, otherwise derive a short description from the app name.
-- When a description is provided, generate a real starting UI that reflects it - not a generic placeholder. The goal is that the user can immediately run the app and see something meaningful.
-- In dev mode, gracefully handle null shell APIs (the app runs outside the iframe during development).
+- Always create `src/webai.js` as the integration layer. Never access `window.apogeeSDK` directly in components.
+- Always add the shell manifest to `index.html` — without it the shell may not inject needed managers.
+- Never use `window.OasisHost`, `window.ApogeeShell`, or `window.CollaborationManager` — these are old globals replaced by `window.apogeeSDK`.
+- Use `onIntelligenceChange` (subscribe) instead of polling `getIntelligenceState` on an interval.
+- Never hardcode app IDs — derive from `package.json` name.
+- Always set `"description"` in `package.json`.
+- When a description is provided, generate a real starting UI that reflects it — not a generic placeholder.
+- In dev mode, gracefully handle null SDK (the app runs outside the iframe during development).

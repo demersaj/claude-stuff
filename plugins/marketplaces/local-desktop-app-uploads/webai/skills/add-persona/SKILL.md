@@ -9,16 +9,17 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # webAI Add Persona
 
-Add Apogee persona support to an existing webAI app.
+Add Apogee persona support to an existing webAI app via `sdk.personas`.
 
 ## What personas are
 
-Personas are AI identities stored in Apogee — each has a name, description, system prompt template, and optionally a specific model/LoRA adapter. Apps can use them in two ways:
+Personas are AI identities stored in Apogee — each has a name, description, and a list of specialties (e.g. `"coding"`, `"writing"`, `"general"`). Apps can use them in several ways:
 
-- **By specialty** (`personaType: "coding"`) — routes to whichever persona the user has configured for that specialty slot. Requires permission (triggers an Apogee approval modal the first time).
-- **By ID** (`personaId: "preset-code"`) — targets a specific persona directly, no permission needed.
+- **By ID** (`sdk.personas.setActive(id)`) — targets a specific persona directly; no permission needed
+- **By specialty + permission** (`sdk.personas.requestAccess(appId, 'coding')`) — routes to whichever persona the user has configured for that specialty slot; triggers an approval modal the first time
+- **Active persona** (`sdk.intelligence.getActivePersona(appId)`) — reads which persona is currently active for this app, without setting it
 
-When a persona is active, its `systemPromptTemplate` replaces any `systemPrompt` you pass to `host.request()`.
+When a persona with a system prompt template is active, it influences the model's behavior automatically. You don't need to fight it — just omit or leave `systemPrompt` empty if using persona routing.
 
 ---
 
@@ -28,91 +29,100 @@ Read the component or file specified. Understand what the app does and what kind
 
 - **Single hardcoded persona** — app always uses one specialty (e.g. a coding helper always uses `"coding"`)
 - **User-selectable picker** — app lists available personas and lets the user choose
-- **Permission-request flow** — app explicitly requests access before using a persona by specialty
+- **Active persona display** — app reads and shows which persona is active without changing it
 
 Pick the right pattern for the app. Most apps need just one.
 
 ---
 
-## Step 2 — Update `src/webai.js` to pass persona options through
+## Step 2 — Check the shell manifest
 
-The standard `webai.js` `streamCompletion` only forwards `systemPrompt`, `maxTokens`, `temperature`, and `onToken`. Persona support requires passing `personaType` or `personaId` to `host.request()`.
+Ensure `"personas"` is in `requires.managers` in `index.html`. If missing, add it:
 
-Find the `streamCompletion` export in `src/webai.js` and update the options forwarding to spread additional options:
-
-**Before:**
-```javascript
-export async function streamCompletion(prompt, { systemPrompt = '', maxTokens = 2048, temperature = 0.7, onToken } = {}) {
-  ...
-  return await host.request(prompt, { systemPrompt, maxTokens, temperature, onToken });
+```html
+"requires": {
+  "managers": ["shell", "intelligence", "personas"]
+}
 ```
-
-**After:**
-```javascript
-export async function streamCompletion(prompt, { systemPrompt = '', maxTokens = 2048, temperature = 0.7, onToken, ...rest } = {}) {
-  ...
-  return await host.request(prompt, { systemPrompt, maxTokens, temperature, onToken, ...rest });
-```
-
-The `...rest` spread lets callers pass `personaType`, `personaId`, `appId`, `thinking`, or any other `OasisRequestOptions` field without the helper needing to know about them explicitly.
 
 ---
 
 ## Step 3 — Create `src/persona.js`
 
 ```javascript
-// src/persona.js — Apogee persona helpers
+// src/persona.js — Apogee persona helpers via sdk.personas
 
-const getHost = () => window.OasisHost ?? window.parent?.OasisHost ?? null;
+const getSDK = () => window.apogeeSDK || null;
 
 /**
- * The app's Apogee ID — used for persona permission scoping.
- * Apogee injects __APOGEE_APP_ID__ at runtime; falls back to package name.
+ * List all personas installed in this Apogee instance.
+ * Returns [{ id, name, description, specialties: string[] }]
+ * Returns [] in local dev or if "personas" not in manifest.
  */
-export function getAppId() {
-  return window.__APOGEE_APP_ID__ ?? null;
+export function listPersonas() {
+  return getSDK()?.personas?.listPersonas?.() ?? [];
 }
 
 /**
- * List all personas available in this Apogee installation.
- * Returns an array of { id, name, description, specialties, systemPromptTemplate, ... }
+ * Get the currently active persona (global shell selection).
+ * Returns { id, name } | null
  */
-export function getPersonas() {
-  return getHost()?.getPersonas?.() ?? [];
+export function getActivePersona() {
+  return getSDK()?.personas?.getActivePersona?.() ?? null;
 }
 
 /**
- * List personas the app has explicit permission to use, keyed by specialty.
- * Returns e.g. { coding: { id, name, type }, writing: { id, name, type } }
+ * Get the active persona scoped to this specific app.
+ * Returns { id, name } | null
  */
-export function getPermittedPersonas(appId) {
-  const id = appId ?? getAppId();
-  return getHost()?.getPersonasWithPermissions?.(id) ?? {};
+export function getAppActivePersona(appId) {
+  return getSDK()?.intelligence?.getActivePersona?.(appId) ?? null;
+}
+
+/**
+ * Set the active persona by ID (no permission needed).
+ * Returns true if set successfully.
+ */
+export function setActivePersona(personaId) {
+  return getSDK()?.personas?.setActive?.(personaId) ?? false;
 }
 
 /**
  * Request access to a persona by specialty (e.g. "coding", "writing", "general").
  * Apogee shows the user an approval modal the first time — subsequent calls are instant.
  * Returns true if access was granted, false if denied.
- *
- * Call this before the first time you use personaType in streamCompletion.
  */
 export async function requestPersonaAccess(personaType, appId) {
-  const host = getHost();
-  const id = appId ?? getAppId();
-  if (!host?.requestPersonaAccess) return false;
-  return host.requestPersonaAccess(id, personaType);
+  const sdk = getSDK();
+  if (!sdk?.personas?.requestAccess) return false;
+  return sdk.personas.requestAccess(appId, personaType);
+}
+
+/**
+ * Get all persona permissions for this app.
+ * Returns { [specialty]: { id, name, type } }
+ */
+export function getPersonaPermissions(appId) {
+  return getSDK()?.personas?.getPermissions?.(appId) ?? {};
 }
 
 /**
  * Remove this app's permission to use a persona specialty.
- * Useful for "disconnect persona" flows.
  */
 export async function removePersonaAccess(personaType, appId) {
-  const host = getHost();
-  const id = appId ?? getAppId();
-  if (!host?.removePersonaPermission) return;
-  return host.removePersonaPermission(id, personaType);
+  const sdk = getSDK();
+  if (!sdk?.personas?.removePermission) return;
+  return sdk.personas.removePermission(appId, personaType);
+}
+
+/**
+ * Subscribe to persona state changes.
+ * Returns unsubscribe fn — call on unmount.
+ */
+export function onPersonasChange(handler) {
+  const sdk = getSDK();
+  if (!sdk?.personas) return () => {};
+  return sdk.personas.subscribe(handler);
 }
 ```
 
@@ -125,21 +135,26 @@ export async function removePersonaAccess(personaType, appId) {
 Best when the app has one clear purpose (coding helper, writing tool, etc.).
 
 ```jsx
-import { requestPersonaAccess, getAppId } from './persona.js';
+import { requestPersonaAccess, getAppActivePersona } from './persona.js';
 import { streamCompletion } from './webai.js';
 
-// On mount or first AI use, request access once
+const APP_ID = document.querySelector('[id="apogee-shell-manifest"]')
+  ? JSON.parse(document.querySelector('[id="apogee-shell-manifest"]').textContent).name
+  : null;
+
+// On mount, request access once
 useEffect(() => {
-  requestPersonaAccess('coding'); // or 'writing', 'general', etc.
+  requestPersonaAccess('coding', APP_ID);
 }, []);
 
-// Then pass personaType to every streamCompletion call
+// Show which persona is active
+const activePersona = getAppActivePersona(APP_ID);
+
 async function generate(prompt) {
   setOutput('');
   try {
     await streamCompletion(prompt, {
-      personaType: 'coding',        // routes to user's configured coding persona
-      appId: getAppId(),
+      // No systemPrompt needed — active persona provides its own
       onToken: (t) => setOutput(prev => prev + t),
     });
   } catch (e) {
@@ -153,32 +168,31 @@ async function generate(prompt) {
 Best when the app serves multiple purposes or users should control the personality.
 
 ```jsx
-import { getPersonas, requestPersonaAccess, getAppId } from './persona.js';
+import { listPersonas, setActivePersona, getActivePersona, onPersonasChange } from './persona.js';
 import { streamCompletion } from './webai.js';
 
 const [personas, setPersonas] = useState([]);
-const [selectedPersona, setSelectedPersona] = useState(null); // { id, name, specialties }
+const [activePersona, setActivePersonaState] = useState(null);
 
 useEffect(() => {
-  setPersonas(getPersonas());
+  setPersonas(listPersonas());
+  setActivePersonaState(getActivePersona());
+  const unsub = onPersonasChange(() => {
+    setPersonas(listPersonas());
+    setActivePersonaState(getActivePersona());
+  });
+  return unsub;
 }, []);
 
-async function handleSelectPersona(persona) {
-  // Request access by first specialty (or use personaId directly — no permission needed)
-  if (persona.specialties?.[0]) {
-    await requestPersonaAccess(persona.specialties[0]);
-  }
-  setSelectedPersona(persona);
+function handleSelectPersona(persona) {
+  setActivePersona(persona.id);
+  setActivePersonaState(persona);
 }
 
 async function generate(prompt) {
   setOutput('');
-  const opts = selectedPersona
-    ? { personaId: selectedPersona.id, appId: getAppId() }   // direct ID — no permission needed
-    : {};                                                      // no persona — uses shell default
   try {
     await streamCompletion(prompt, {
-      ...opts,
       onToken: (t) => setOutput(prev => prev + t),
     });
   } catch (e) {
@@ -190,68 +204,43 @@ async function generate(prompt) {
 <select onChange={e => {
   const p = personas.find(p => p.id === e.target.value);
   if (p) handleSelectPersona(p);
-}}>
+}} value={activePersona?.id ?? ''}>
   <option value="">Default (shell setting)</option>
   {personas.map(p => (
     <option key={p.id} value={p.id}>
-      {p.name} — {p.description}
+      {p.name}{p.specialties?.length ? ` — ${p.specialties.join(', ')}` : ''}
     </option>
   ))}
 </select>
 ```
 
-### Pattern C — Permission-request flow with status display
+### Pattern C — Active persona display only
 
-Best when the app needs to show which persona is active and let users grant/revoke access.
+Best when you just want to show the user which persona is responding, without letting them change it.
 
 ```jsx
-import { getPersonas, getPermittedPersonas, requestPersonaAccess, removePersonaAccess, getAppId } from './persona.js';
-import { streamCompletion } from './webai.js';
+import { getActivePersona, onPersonasChange } from './persona.js';
 
-const appId = getAppId();
-const [personas, setPersonas] = useState([]);
-const [permitted, setPermitted] = useState({}); // { specialty: { id, name } }
-const [activeType, setActiveType] = useState(null);
+const [activePersona, setActivePersonaState] = useState(getActivePersona);
 
 useEffect(() => {
-  setPersonas(getPersonas());
-  setPermitted(getPermittedPersonas(appId));
+  return onPersonasChange(() => setActivePersonaState(getActivePersona()));
 }, []);
 
-async function handleRequest(personaType) {
-  const granted = await requestPersonaAccess(personaType, appId);
-  if (granted) {
-    setPermitted(getPermittedPersonas(appId));
-    setActiveType(personaType);
-  }
-}
-
-async function handleRevoke(personaType) {
-  await removePersonaAccess(personaType, appId);
-  setPermitted(getPermittedPersonas(appId));
-  if (activeType === personaType) setActiveType(null);
-}
-
-// In the generate call:
-await streamCompletion(prompt, {
-  personaType: activeType,   // null means shell default
-  appId,
-  onToken: (t) => setOutput(prev => prev + t),
-});
+// Render:
+{activePersona && <span className="persona-badge">Persona: {activePersona.name}</span>}
 ```
 
 ---
 
-## Step 5 — Add persona name to the UI
+## Step 5 — Show the active persona name in the UI
 
-Whichever pattern you use, show the active persona name somewhere in the header or near the generate button — users need to know which persona is responding.
+Whichever pattern you use, always show the active persona name somewhere visible — users need to know which persona is responding.
 
 ```jsx
-// For Pattern A (hardcoded):
-<span>Using: {getPermittedPersonas()[selectedType]?.name ?? selectedType}</span>
-
-// For Pattern B (picker):
-<span>{selectedPersona ? `Persona: ${selectedPersona.name}` : 'Default persona'}</span>
+<span className="active-persona">
+  {activePersona ? `🎭 ${activePersona.name}` : 'Default persona'}
+</span>
 ```
 
 ---
@@ -267,9 +256,10 @@ node ../../scripts/upload.js
 
 ## Rules
 
-- Always update `streamCompletion` to spread `...rest` before wiring persona options — otherwise `personaType`/`personaId` are silently dropped.
-- `personaType` (specialty routing) requires calling `requestPersonaAccess` first; `personaId` (direct ID) does not.
-- Personas are only available inside Apogee — `getPersonas()` returns `[]` in local dev, which is fine.
-- The persona's `systemPromptTemplate` replaces any `systemPrompt` you pass — don't fight it. If you need to combine them, use `personaId` to target by ID and leave `systemPrompt` empty.
-- `getAppId()` returns `null` in local dev (`__APOGEE_APP_ID__` is only injected by Apogee at runtime). Persona permission calls are no-ops when the host is null, so this is safe.
-- Don't show persona selection UI when `getPersonas()` returns an empty array — just hide or disable it gracefully.
+- Always declare `"personas"` in the manifest managers — `sdk.personas` won't be injected without it.
+- Personas are only available inside Apogee — `listPersonas()` returns `[]` in local dev, which is fine.
+- `setActivePersona(id)` (direct ID) does not require permission. `requestPersonaAccess(type)` (specialty routing) triggers an approval modal the first time.
+- When a persona is active, its system prompt overrides yours — don't pass a conflicting `systemPrompt` to `streamCompletion`.
+- Don't show persona selection UI when `listPersonas()` returns an empty array — hide or disable it gracefully.
+- Subscribe to `onPersonasChange` to keep the UI in sync when the user changes their persona settings in the shell.
+- `getAppActivePersona(appId)` (from `sdk.intelligence`) gives the persona scoped to a specific app. `getActivePersona()` (from `sdk.personas`) gives the global shell selection.

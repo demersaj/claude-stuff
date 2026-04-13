@@ -9,43 +9,32 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # webAI Add Memory
 
-Add persistent AI conversation memory to a webAI app.
+Add persistent AI conversation memory to a webAI app using `sdk.storage`.
 
 ## How it works
 
-Apogee stores up to 60 conversation turns per app in IndexedDB (key: `oasis_app_history:{appId}`). When you pass `appId` to `host.request()`, turns are saved automatically — no manual append needed. On the next request, prior turns are injected as context so the AI remembers what was said.
+Conversation history is stored in `sdk.storage` under a key scoped to the app (e.g. `chat_history`). On mount, load the history. On each exchange, append the user turn and the assistant reply, then save. Pass prior turns as `priorMessages` to `streamCompletion` so the AI has context from previous sessions.
 
-The memory system has two controls:
-- **`appId`** — scopes history to this app. Required for any persistence.
-- **`memoryContext`** — controls whether history is *injected* as context. `'auto'` (default) respects the user's shell Memory toggle; `true` forces it on; `false` disables injection for that request only.
-- **`chatSession`** (optional) — a string that isolates turns into separate threads. Useful for multi-conversation apps.
-
-Saving is always automatic when `appId` is present. `memoryContext` only controls retrieval.
+The 60-turn limit is enforced by trimming the array before saving — oldest turns are evicted first.
 
 ---
 
 ## Step 1 — Read the target file
 
-Read the component specified (or ask). Understand how the app currently calls `streamCompletion` — the main change is adding `appId` and loading history on mount.
+Read the component specified (or ask). Understand how the app currently calls `streamCompletion` — the main changes are:
+1. Adding `sdk.storage` for persistence
+2. Passing `priorMessages` to `streamCompletion` for context
 
 ---
 
-## Step 2 — Update `src/webai.js` to pass options through
+## Step 2 — Check the shell manifest
 
-If `streamCompletion` doesn't already spread `...rest` into `host.request()`, patch it now. This is the same fix as `add-persona` — without it, `appId` is silently dropped.
+Ensure `"storage"` is in `requires.managers` in `index.html`. If missing, add it:
 
-**Find this in `src/webai.js`:**
-```javascript
-export async function streamCompletion(prompt, { systemPrompt = '', maxTokens = 2048, temperature = 0.7, onToken } = {}) {
-  ...
-  return await host.request(prompt, { systemPrompt, maxTokens, temperature, onToken });
-```
-
-**Replace with:**
-```javascript
-export async function streamCompletion(prompt, { systemPrompt = '', maxTokens = 2048, temperature = 0.7, onToken, ...rest } = {}) {
-  ...
-  return await host.request(prompt, { systemPrompt, maxTokens, temperature, onToken, ...rest });
+```html
+"requires": {
+  "managers": ["shell", "intelligence", "storage"]
+}
 ```
 
 ---
@@ -53,49 +42,65 @@ export async function streamCompletion(prompt, { systemPrompt = '', maxTokens = 
 ## Step 3 — Create `src/memory.js`
 
 ```javascript
-// src/memory.js — App conversation memory helpers
+// src/memory.js — Persistent conversation memory using sdk.storage
 
-const getHost = () => window.OasisHost ?? window.parent?.OasisHost ?? null;
+const STORAGE_KEY = 'chat_history';
+const MAX_TURNS = 60;
+
+const getSDK = () => window.apogeeSDK || null;
 
 /**
- * The app's Apogee ID — scopes memory to this app.
- * Injected at runtime by Apogee; null in local dev (memory calls are no-ops).
+ * Load conversation history from storage.
+ * Returns an array of { role: 'user'|'assistant', content: string, at: string }
+ * Returns [] in local dev (sdk.storage is null).
  */
-export function getAppId() {
-  return window.__APOGEE_APP_ID__ ?? null;
+export async function loadHistory() {
+  const sdk = getSDK();
+  if (!sdk?.storage) return [];
+  const raw = await sdk.storage.get(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : [];
 }
 
 /**
- * Load the app's conversation history.
- * Returns { recentTurns, summary, preferences, updatedAt }
- *
- * recentTurns is an array of { role, text, at, turnId, chatSession }
- * Up to 60 turns are stored; oldest are evicted automatically.
+ * Save conversation history (auto-trims to MAX_TURNS).
+ * Values must be strings — JSON-serialize before saving.
  */
-export async function loadHistory(appId) {
-  const id = appId ?? getAppId();
-  const host = getHost();
-  if (!host || !id) return { recentTurns: [], summary: '', preferences: {}, updatedAt: null };
-  return host.loadAppChatHistory(id);
+export async function saveHistory(turns) {
+  const sdk = getSDK();
+  if (!sdk?.storage) return;
+  await sdk.storage.set(STORAGE_KEY, JSON.stringify(turns.slice(-MAX_TURNS)));
 }
 
 /**
- * Clear all conversation history for this app.
+ * Append a user + assistant turn pair and save.
+ * Call this after the assistant reply is complete.
  */
-export async function clearHistory(appId) {
-  const id = appId ?? getAppId();
-  const host = getHost();
-  if (!host || !id) return;
-  return host.clearAppChatHistory(id);
+export async function appendAndSave(turns, userText, assistantText) {
+  const now = new Date().toISOString();
+  const next = [
+    ...turns,
+    { role: 'user', content: userText, at: now },
+    { role: 'assistant', content: assistantText, at: now },
+  ];
+  await saveHistory(next);
+  return next.slice(-MAX_TURNS);
 }
 
 /**
- * Filter turns to a specific chat session (if your app uses multiple threads).
- * Pass null/undefined to get all turns.
+ * Clear all conversation history.
  */
-export function filterSession(turns, chatSession) {
-  if (!chatSession) return turns;
-  return turns.filter(t => t.chatSession === chatSession);
+export async function clearHistory() {
+  const sdk = getSDK();
+  if (!sdk?.storage) return;
+  await sdk.storage.delete(STORAGE_KEY);
+}
+
+/**
+ * Convert stored turns into the messages[] format for chatCompletionStream.
+ * Trims to the most recent N turns to stay within context limits.
+ */
+export function toMessageContext(turns, limit = 20) {
+  return turns.slice(-limit).map(t => ({ role: t.role, content: t.content }));
 }
 
 /**
@@ -118,21 +123,16 @@ export function formatTurnTime(isoString) {
 
 ### Pattern A — Persistent single-thread chat (most common)
 
-The app remembers everything across sessions. History loads on mount, new turns auto-save on every request.
-
 ```jsx
-import { loadHistory, clearHistory, getAppId, formatTurnTime } from './memory.js';
+import { loadHistory, appendAndSave, clearHistory, toMessageContext, formatTurnTime } from './memory.js';
 import { streamCompletion } from './webai.js';
-
-const appId = getAppId();
 
 // Load history on mount
 const [turns, setTurns] = useState([]);
 useEffect(() => {
-  loadHistory(appId).then(mem => setTurns(mem.recentTurns));
+  loadHistory().then(setTurns);
 }, []);
 
-// Generate — appId causes auto-save; no manual turn management needed
 const [input, setInput] = useState('');
 const [isGenerating, setIsGenerating] = useState(false);
 
@@ -142,31 +142,34 @@ async function handleSend() {
   setInput('');
 
   // Optimistically add user turn to UI
-  const userTurn = { role: 'user', text: userText, at: new Date().toISOString() };
+  const userTurn = { role: 'user', content: userText, at: new Date().toISOString() };
   setTurns(prev => [...prev, userTurn]);
 
   setIsGenerating(true);
   let assistantText = '';
-  const assistantTurn = { role: 'assistant', text: '', at: new Date().toISOString() };
+  const assistantTurn = { role: 'assistant', content: '', at: new Date().toISOString() };
   setTurns(prev => [...prev, assistantTurn]);
 
   try {
     await streamCompletion(userText, {
-      appId,                      // ← enables auto-save + history context
-      memoryContext: 'auto',      // respects shell memory toggle
+      systemPrompt: 'You are a helpful assistant.',
+      priorMessages: toMessageContext(turns),   // ← inject history as context
       onToken: (token) => {
         assistantText += token;
         setTurns(prev => {
           const next = [...prev];
-          next[next.length - 1] = { ...assistantTurn, text: assistantText };
+          next[next.length - 1] = { ...assistantTurn, content: assistantText };
           return next;
         });
       },
     });
+    // Save the completed exchange
+    const saved = await appendAndSave(turns, userText, assistantText);
+    setTurns(saved);
   } catch (e) {
     setTurns(prev => {
       const next = [...prev];
-      next[next.length - 1] = { ...assistantTurn, text: `Error: ${e.message}` };
+      next[next.length - 1] = { ...assistantTurn, content: `Error: ${e.message}` };
       return next;
     });
   } finally {
@@ -175,7 +178,7 @@ async function handleSend() {
 }
 
 async function handleClear() {
-  await clearHistory(appId);
+  await clearHistory();
   setTurns([]);
 }
 ```
@@ -184,9 +187,9 @@ async function handleClear() {
 ```jsx
 <div className="chat-history">
   {turns.map((turn, i) => (
-    <div key={turn.turnId ?? i} className={`turn turn-${turn.role}`}>
+    <div key={i} className={`turn turn-${turn.role}`}>
       <span className="turn-role">{turn.role === 'user' ? 'You' : 'AI'}</span>
-      <p className="turn-text">{turn.text}</p>
+      <p className="turn-text">{turn.content}</p>
       <span className="turn-time">{formatTurnTime(turn.at)}</span>
     </div>
   ))}
@@ -208,57 +211,26 @@ async function handleClear() {
 
 ---
 
-### Pattern B — Multiple independent threads
+### Pattern B — Memory stats display
 
-Best when the app has distinct conversations (e.g. per-document, per-task). Each thread gets its own `chatSession` string; all threads share the same 60-turn pool.
-
-```jsx
-import { loadHistory, clearHistory, filterSession, getAppId } from './memory.js';
-
-const appId = getAppId();
-const [sessionId] = useState(() => `session-${Date.now()}`); // new thread each mount
-// Or persist session ID: useState(() => localStorage.getItem('sessionId') ?? `session-${Date.now()}`)
-
-const [turns, setTurns] = useState([]);
-useEffect(() => {
-  loadHistory(appId).then(mem => {
-    setTurns(filterSession(mem.recentTurns, sessionId));
-  });
-}, [sessionId]);
-
-// Pass chatSession to scope turns
-await streamCompletion(userText, {
-  appId,
-  chatSession: sessionId,   // turns for this thread only injected as context
-  memoryContext: true,
-  onToken: ...
-});
-```
-
----
-
-### Pattern C — Memory summary display
-
-Show the user a compact summary of what the AI remembers (turn count, last active, preferences if any).
+Show the user a compact summary of what the AI remembers.
 
 ```jsx
-const [memStats, setMemStats] = useState(null);
+const [turnCount, setTurnCount] = useState(0);
+const [lastActive, setLastActive] = useState(null);
 
 useEffect(() => {
-  loadHistory(appId).then(mem => {
-    setMemStats({
-      turnCount: mem.recentTurns.length,
-      lastActive: mem.updatedAt,
-      hasPreferences: Object.keys(mem.preferences).length > 0,
-    });
+  loadHistory().then(h => {
+    setTurns(h);
+    setTurnCount(h.length);
+    setLastActive(h.at(-1)?.at ?? null);
   });
 }, []);
 
-// Render:
-{memStats && memStats.turnCount > 0 && (
+{turnCount > 0 && (
   <div className="memory-badge">
-    {memStats.turnCount} turns remembered
-    {memStats.lastActive && ` · last: ${formatTurnTime(memStats.lastActive)}`}
+    {turnCount} turns remembered
+    {lastActive && ` · last: ${formatTurnTime(lastActive)}`}
     <button onClick={handleClear}>Clear</button>
   </div>
 )}
@@ -309,9 +281,10 @@ node ../../scripts/upload.js
 
 ## Rules
 
-- Always apply the `...rest` spread fix to `webai.js` before wiring `appId` — without it, `appId` is silently dropped and nothing is saved.
-- `appId` is `null` in local dev (`__APOGEE_APP_ID__` is only injected by Apogee). `loadHistory` and `clearHistory` both guard against null and are safe no-ops in dev.
-- History is always saved when `appId` is present — `memoryContext: false` only skips *injecting* prior turns as context, it doesn't stop saving the current turn.
-- Optimistically update the UI (add user turn immediately, stream assistant turn in place) — don't wait for the request to finish before showing anything.
-- The 60-turn limit is per app, not per session. If the app uses multiple `chatSession` values, all threads share the same pool.
+- Always declare `"storage"` in the manifest managers — `sdk.storage` won't be injected without it.
+- `sdk.storage` is null in local dev. `loadHistory` and `clearHistory` both guard against this and are safe no-ops.
+- Pass `priorMessages: toMessageContext(turns)` to `streamCompletion` — this is how context is injected. Without it, the AI won't remember previous turns.
+- Only call `appendAndSave` after the assistant reply is fully complete (in the happy-path block, not the catch block). Don't save partial or error responses.
+- `toMessageContext` limits history to 20 turns by default — this prevents exceeding the model's context window. Adjust the limit for long-context models.
 - Don't call `clearHistory` without explicit user action (a button). Clearing is permanent.
+- Optimistically update the UI (add user turn immediately, stream assistant turn in place) — don't wait for the request to finish before showing anything.

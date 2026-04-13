@@ -1,8 +1,0 @@
-{
-  "name": "dev",
-  "version": "1.0.0",
-  "description": "Developer agent - takes a PRD or instructions, writes a plan, and executes it",
-  "author": {
-    "name": "local"
-  }
-}
