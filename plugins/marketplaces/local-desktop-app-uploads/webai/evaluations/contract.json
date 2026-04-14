@@ -1,0 +1,130 @@
+{
+  "$comment": "Snapshot of the shell manifest embedded in skills/webai-app/references/app-start-kit.html (head). Regenerate with: node evaluations/refresh-contract.mjs",
+  "referenceHtml": "skills/webai-app/references/app-start-kit.html",
+  "canonicalShellManifest": {
+    "schemaVersion": 1,
+    "name": "webAI SDK Starter Kit",
+    "description": "Build-generated webAI SDK docs and starter kit",
+    "author": "webAI",
+    "version": "1.0.0",
+    "minPlatformApiLevel": 2,
+    "provides": {
+      "hasOwnRouting": true
+    },
+    "requires": {
+      "managers": [
+        "shell",
+        "identity",
+        "crypto",
+        "theme",
+        "files",
+        "people",
+        "messaging",
+        "notifications",
+        "profile",
+        "contentIndex",
+        "searchIndex",
+        "intelligence",
+        "windows",
+        "apps",
+        "storage",
+        "flags",
+        "liminal",
+        "settings",
+        "context",
+        "browser",
+        "idn",
+        "viewOrchestration",
+        "interfaces",
+        "interfaceAdmin",
+        "room",
+        "canvas",
+        "personas"
+      ]
+    }
+  },
+  "startKitHtmlSignals": [
+    {
+      "name": "sdk_bridge_documented",
+      "pattern": "window.apogeeSDK"
+    },
+    {
+      "name": "platform_metadata_documented",
+      "pattern": "__APOGEE_PLATFORM"
+    },
+    {
+      "name": "manifest_mime_documented",
+      "pattern": "application/apogee-shell-manifest+json"
+    }
+  ],
+  "pluginTemplateSignals": [
+    {
+      "name": "templates_webai_js_sdk_guard",
+      "file": "templates/webai.js",
+      "pattern": "window.apogeeSDK"
+    },
+    {
+      "name": "templates_webai_js_stream",
+      "file": "templates/webai.js",
+      "pattern": "chatCompletionStream"
+    },
+    {
+      "name": "templates_webai_js_rest_forward",
+      "file": "templates/webai.js",
+      "pattern": "...rest"
+    },
+    {
+      "name": "templates_react_finally_ai",
+      "file": "templates/react/App.jsx",
+      "pattern": "finally"
+    },
+    {
+      "name": "templates_upload_reads_dist",
+      "file": "templates/upload.js",
+      "pattern": "dist/index.html"
+    }
+  ],
+  "skillDocSignals": [
+    {
+      "name": "webai_app_skill_manifest_mime",
+      "file": "skills/webai-app/SKILL.md",
+      "pattern": "application/apogee-shell-manifest+json"
+    },
+    {
+      "name": "webai_app_skill_apogee_sdk",
+      "file": "skills/webai-app/SKILL.md",
+      "pattern": "apogeeSDK"
+    },
+    {
+      "name": "new_app_skill_manifest_first_in_head",
+      "file": "skills/new-app/SKILL.md",
+      "pattern": "first `<script>` in `<head>`"
+    }
+  ],
+  "commandSkillRefs": [
+    {
+      "file": "commands/create-app.md",
+      "pattern": "webai:create-app"
+    },
+    {
+      "file": "commands/debug-app.md",
+      "pattern": "webai:debug-app"
+    },
+    {
+      "file": "commands/update-app.md",
+      "pattern": "webai:update-app"
+    },
+    {
+      "file": "commands/webai-app.md",
+      "pattern": "webai:webai-app"
+    },
+    {
+      "file": "commands/add-persona.md",
+      "pattern": "webai:add-persona"
+    },
+    {
+      "file": "commands/add-memory.md",
+      "pattern": "webai:add-memory"
+    }
+  ]
+}

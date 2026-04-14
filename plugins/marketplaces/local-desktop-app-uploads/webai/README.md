@@ -102,25 +102,21 @@ The `templates/` directory contains:
 
 ## Evaluation suite
 
-Automated checks live under `evaluations/`:
+Evaluations are **anchored to** `skills/webai-app/references/app-start-kit.html`: the runner parses the embedded shell manifest from that file and compares it to `evaluations/contract.json`, then checks that templates and skill docs still match the SDK patterns documented in the start kit.
 
-| Artifact | Purpose |
-|----------|---------|
-| `evaluations/plugin-integrity.json` | Static checks: templates export the right helpers, each skill and command references the expected APIs and `webai:*` skill names, eval packs exist where defined |
-| `evaluations/suite.json` | Index of integrity vs workspace (golden app) eval layers |
-| `evaluations/run-eval.mjs` | Runner (Node 18+) |
+| File | Purpose |
+|------|---------|
+| `evaluations/contract.json` | Expected manifest snapshot + lists of substring checks for the start kit, `templates/`, and key skills |
+| `evaluations/manifest-extract.mjs` | Shared manifest parser (used by runner and refresh script) |
+| `evaluations/run-eval.mjs` | Full suite (Node 18+) |
+| `evaluations/refresh-contract.mjs` | Updates `canonicalShellManifest` in `contract.json` after `app-start-kit.html` changes |
+| `evaluations/README.md` | Details and extension points |
 
-**Run plugin checks (no monorepo required):**
+**Run (from this plugin directory):**
 
 ```bash
-cd plugins/marketplaces/local-desktop-app-uploads/webai   # or your path to this plugin
 node evaluations/run-eval.mjs
-```
-
-**Run golden workspace assertions** (paths like `apps/pomodoro-timer/` must exist under the repo root):
-
-```bash
 node evaluations/run-eval.mjs --workspace /path/to/your/webai-monorepo
 ```
 
-Per-skill scenario JSON files are under `skills/<name>/evals/evals.json` for: `create-app`, `debug-app`, `update-app`, `add-persona`, `add-memory`. Skills without JSON packs (`webai-app`, `new-app`, `build-upload`, `add-oasis`, `add-collab`) are covered by plugin integrity only until you add eval packs.
+See `evaluations/README.md` for the full checklist and how to extend `contract.json`.
