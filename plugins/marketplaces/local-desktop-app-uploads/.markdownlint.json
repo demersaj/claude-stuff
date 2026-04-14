@@ -1,0 +1,6 @@
+{  
+    "default": true,  // start with all default rules
+    "MD013": {  
+        "line_length": 160  // allow lines up to 160 characters
+    }   
+} 
