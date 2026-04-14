@@ -1,5 +1,5 @@
 ---
-description: webAI Apogee shell app architecture and APIs. Reference for building single-file React/Vue apps that run inside the Apogee iframe with OasisHost AI, navigation, collaboration, and identity APIs.
+description: webAI Apogee shell app architecture and APIs. Reference for building single-file React/Vue apps that run inside the Apogee iframe with SDK intelligence, storage, room, personas, identity, and shell APIs.
 argument-hint: ""
 allowed-tools: Read
 ---

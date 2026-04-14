@@ -7,7 +7,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/pm",
         "version": "1.0.0",
         "installedAt": "2026-02-19T20:47:58.748Z",
-        "lastUpdated": "2026-02-19T20:47:58.748Z"
+        "lastUpdated": "2026-04-13T17:55:12.147Z"
       }
     ],
     "resume@local-desktop-app-uploads": [
@@ -16,7 +16,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/resume",
         "version": "1.0.0",
         "installedAt": "2026-02-19T00:00:00.000Z",
-        "lastUpdated": "2026-02-19T00:00:00.000Z"
+        "lastUpdated": "2026-04-13T17:55:12.147Z"
       }
     ],
     "webai@local-desktop-app-uploads": [
@@ -25,7 +25,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/webai",
         "version": "1.0.0",
         "installedAt": "2026-02-24T23:15:32.675Z",
-        "lastUpdated": "2026-02-24T23:15:32.675Z"
+        "lastUpdated": "2026-04-13T17:55:12.147Z"
       }
     ],
     "dev@local-desktop-app-uploads": [
@@ -34,7 +34,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/dev",
         "version": "1.0.0",
         "installedAt": "2026-02-26T00:00:00.000Z",
-        "lastUpdated": "2026-02-26T00:00:00.000Z"
+        "lastUpdated": "2026-04-13T17:55:12.147Z"
       }
     ],
     "student-assistant@local-desktop-app-uploads": [
@@ -43,7 +43,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/student-assistant",
         "version": "1.0.0",
         "installedAt": "2026-03-19T00:00:00.000Z",
-        "lastUpdated": "2026-03-19T00:00:00.000Z"
+        "lastUpdated": "2026-04-13T17:55:12.147Z"
       }
     ],
     "figma@claude-plugins-official": [
@@ -52,7 +52,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/cache/claude-plugins-official/figma/2.1.3",
         "version": "2.1.3",
         "installedAt": "2026-03-29T14:56:37.118Z",
-        "lastUpdated": "2026-04-08T16:00:45.480Z",
+        "lastUpdated": "2026-04-13T17:55:12.147Z",
         "gitCommitSha": "512f1c770037f8bb4a86748df54e219716d64414"
       }
     ],
@@ -62,7 +62,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads/stock-advisor",
         "version": "1.0.0",
         "installedAt": "2026-04-06T00:00:00.000Z",
-        "lastUpdated": "2026-04-06T00:00:00.000Z"
+        "lastUpdated": "2026-04-13T17:55:12.147Z"
       }
     ],
     "gitlab@claude-plugins-official": [
@@ -71,7 +71,7 @@
         "installPath": "/Users/huxley-47/.claude/plugins/cache/claude-plugins-official/gitlab/e423640d3002",
         "version": "e423640d3002",
         "installedAt": "2026-04-02T14:49:12.190Z",
-        "lastUpdated": "2026-04-08T16:00:44.636Z",
+        "lastUpdated": "2026-04-13T17:55:12.147Z",
         "gitCommitSha": "7636aad5eeb526a977d4ed2b65b074fddc5be9d8"
       }
     ]

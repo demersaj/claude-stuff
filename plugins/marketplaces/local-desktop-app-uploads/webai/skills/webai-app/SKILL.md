@@ -436,6 +436,16 @@ const modelId = state?.selectedModel || 'auto';  // use 'auto' as fallback
 
 ---
 
+## Full SDK reference
+
+For the complete interactive SDK documentation, live code examples, TypeScript signatures, and recipes for every available facade, see:
+
+`references/app-start-kit.html`
+
+This is the official webAI SDK Starter Kit. Open it in a browser or read it directly. It covers all managers (`shell`, `identity`, `intelligence`, `room`, `messaging`, `files`, `people`, `storage`, `windows`, `personas`, `canvas`, and more) with runnable examples for every method.
+
+---
+
 ## Vanilla JS app template
 
 For apps that don't need a build step, use this self-contained HTML template. It demonstrates the manifest, theme bootstrap, design tokens, AI streaming, storage, and identity — all in vanilla JS.

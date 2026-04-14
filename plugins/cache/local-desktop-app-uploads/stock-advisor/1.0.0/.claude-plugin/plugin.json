@@ -1,8 +1,0 @@
-{
-  "name": "stock-advisor",
-  "version": "1.0.0",
-  "description": "Analyzes any stock or private company and produces a buy/sell/hold recommendation with structured reasoning",
-  "author": {
-    "name": "local"
-  }
-}

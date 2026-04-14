@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { getOasisState, streamCompletion, goToLauncher } from './webai';
+import { getSDK, getIntelligenceState, onIntelligenceChange, streamCompletion, cancelGeneration, goToLauncher } from './webai';
 
 function App() {
-  const [oasisState, setOasisState] = useState('waiting');
+  const [intelligenceState, setIntelligenceState] = useState('waiting');
   const [prompt, setPrompt] = useState('');
   const [output, setOutput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Poll Oasis AI status every 1.2s
+  // Subscribe to intelligence state changes (not polling)
   useEffect(() => {
-    setOasisState(getOasisState());
-    const id = setInterval(() => setOasisState(getOasisState()), 1200);
-    return () => clearInterval(id);
+    setIntelligenceState(getIntelligenceState());
+    return onIntelligenceChange(() => setIntelligenceState(getIntelligenceState()));
   }, []);
 
   async function handleRun() {
@@ -19,11 +18,10 @@ function App() {
     setIsGenerating(true);
     setOutput('');
     try {
-      await streamCompletion(
-        prompt,
-        'You are a helpful assistant.', // TODO: customize your system prompt
-        (token) => setOutput(prev => prev + token)
-      );
+      await streamCompletion(prompt, {
+        systemPrompt: 'You are a helpful assistant.', // TODO: customize your system prompt
+        onToken: (token) => setOutput(prev => prev + token),
+      });
     } catch (err) {
       setOutput('Error: ' + err.message);
     } finally {
@@ -31,14 +29,26 @@ function App() {
     }
   }
 
+  function handleCancel() {
+    cancelGeneration();
+    setIsGenerating(false);
+  }
+
   const statusLabel = {
-    ready: '🟢 AI Ready',
-    loading: '🟡 Loading...',
-    waiting: '⚪ No Model',
-  }[oasisState];
+    ready: '● Ready',
+    loading: '◌ Loading…',
+    waiting: '○ Waiting',
+  }[intelligenceState];
+
+  const sdk = getSDK();
 
   return (
     <div style={{ fontFamily: 'sans-serif', maxWidth: 600, margin: '0 auto', padding: 16 }}>
+      {!sdk && (
+        <div style={{ background: '#fff3cd', border: '1px solid #ffc107', borderRadius: 4, padding: '8px 12px', marginBottom: 12, fontSize: 13 }}>
+          Running outside Apogee — AI features disabled
+        </div>
+      )}
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={{ margin: 0, fontSize: 20 }}>My webAI App</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -57,13 +67,20 @@ function App() {
           rows={4}
           style={{ width: '100%', boxSizing: 'border-box', fontSize: 14, padding: 8 }}
         />
-        <button
-          onClick={handleRun}
-          disabled={isGenerating || oasisState !== 'ready'}
-          style={{ marginTop: 8, padding: '8px 16px', cursor: 'pointer' }}
-        >
-          {isGenerating ? 'Generating...' : 'Run'}
-        </button>
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <button
+            onClick={handleRun}
+            disabled={isGenerating || intelligenceState !== 'ready'}
+            style={{ padding: '8px 16px', cursor: 'pointer' }}
+          >
+            {isGenerating ? 'Generating…' : 'Run'}
+          </button>
+          {isGenerating && (
+            <button onClick={handleCancel} style={{ padding: '8px 16px', cursor: 'pointer' }}>
+              Stop
+            </button>
+          )}
+        </div>
         {output && (
           <pre style={{ marginTop: 16, background: '#f5f5f5', padding: 12, borderRadius: 4, whiteSpace: 'pre-wrap', fontSize: 14 }}>
             {output}
