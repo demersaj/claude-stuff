@@ -360,6 +360,98 @@ sdk.canvas.updateAppState(appId, partialState, projectId);
 const unsub = sdk.canvas.subscribeAppState(appId, fn, projectId);
 ```
 
+## Context — `sdk.context`
+
+Requires `"context"` in the manifest managers. Injects personalized user context into AI prompts — the easiest way to make the AI aware of who the user is without managing that data yourself.
+
+```javascript
+// Get the context policy (what the user has opted in to sharing)
+const policy = sdk.context.getContextPolicy();
+
+// Get a ready-to-inject context pack for AI prompts
+// Returns a structured object with relevant signals about the user's environment
+const pack = await sdk.context.getContextPack();
+// pack: { summary?: string, signals?: object[], ... }
+
+// Inject into a streamCompletion call:
+const ctx = await sdk.context.getContextPack();
+await streamCompletion(prompt, {
+  systemPrompt: `You are a helpful assistant.\n\nUser context:\n${ctx?.summary ?? ''}`,
+  onToken,
+});
+
+// Subscribe to policy changes (returns unsubscribe fn)
+const unsub = sdk.context.subscribe(() => refreshPolicy());
+```
+
+## Profile — `sdk.profile`
+
+Requires `"profile"` in the manifest managers. Read user profiles, navigate to profile views, and subscribe to profile changes.
+
+```javascript
+// Get the current user's own profile state
+const profile = sdk.profile.getState();
+// profile: { odid, displayName, bio, sections, ... }
+
+// Get another user's profile by their odid
+const other = sdk.profile.getProfile(odid);
+
+// Navigate the shell to show a profile
+sdk.profile.openProfile(odid);
+
+// Update the current user's header fields
+sdk.profile.setHeader({ displayName: 'New Name', bio: 'Short bio' });
+
+// Update activity/status
+sdk.profile.setActivity({ status: 'Building something cool' });
+
+// Subscribe to profile state changes (returns unsubscribe fn)
+const unsub = sdk.profile.subscribe(() => reload());
+```
+
+## Feature Flags — `sdk.flags`
+
+Requires `"flags"` in the manifest managers. Read and toggle shell feature flags at runtime.
+
+```javascript
+// Check if a flag is enabled
+const enabled = sdk.flags.isEnabled('my-feature');
+
+// Get the full flag state map
+const all = sdk.flags.getState();
+// all: { [flagKey: string]: boolean }
+
+// Enable or disable a flag
+sdk.flags.setEnabled('my-feature', true);
+
+// Subscribe to flag changes (returns unsubscribe fn)
+const unsub = sdk.flags.subscribe(() => checkFlags());
+```
+
+## Browser — `sdk.browser`
+
+Requires `"browser"` in the manifest managers. Open, navigate, and manage browser tabs within the Apogee shell.
+
+```javascript
+// Open a new browser tab (returns tab id)
+const tabId = await sdk.browser.createTab('https://example.com');
+
+// Navigate an existing tab
+await sdk.browser.navigateTo(tabId, 'https://other.com');
+
+// Browser history
+const history = sdk.browser.listHistory();
+sdk.browser.recordHistory('https://example.com', 'Example Site');
+
+// Tab lifecycle
+await sdk.browser.focusTab(tabId);
+await sdk.browser.closeTab(tabId);
+await sdk.browser.goBack(tabId);
+
+// Subscribe to tab state changes (returns unsubscribe fn)
+const unsub = sdk.browser.subscribe(() => refreshTabs());
+```
+
 ## Messaging — `sdk.messaging`
 
 Requires `"messaging"` in the manifest managers. Full conversation management including AI threads.
@@ -427,6 +519,10 @@ const modelId = state?.selectedModel || 'auto';  // use 'auto' as fallback
 | Files | `sdk.files` | `files` | File read/write |
 | Notifications | `sdk.notifications` | `notifications` | Push, feed |
 | Canvas | `sdk.canvas` | `canvas` | Project-scoped shared state |
+| Context | `sdk.context` | `context` | Inject user context into AI prompts |
+| Profile | `sdk.profile` | `profile` | Read/display/navigate user profiles |
+| Feature flags | `sdk.flags` | `flags` | Runtime feature flag reads and toggles |
+| Browser | `sdk.browser` | `browser` | Open and manage in-shell browser tabs |
 
 ## Default values
 
