@@ -15,20 +15,25 @@ Build the current app and generate an upload script for the Apogee shell.
 2. **Verify vite.config** uses `vite-plugin-singlefile`. If not, patch it automatically.
 
 3. **Run the build:**
+
    ```bash
    npm run build
    ```
+
    If the build fails, show the error and stop.
 
 4. **Verify output** - check that `dist/index.html` exists and is a self-contained file (no external script/link tags pointing to relative paths).
 
 5. **Run the upload script generator:**
+
    ```bash
    node scripts/upload.js
    ```
+
    If `scripts/upload.js` doesn't exist, create it first using the template from the webai-app skill.
 
 6. **Print the upload instructions** clearly:
+
    ```
    ✅ Build complete: dist/index.html (<size>)
 

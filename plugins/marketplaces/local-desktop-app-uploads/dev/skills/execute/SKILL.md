@@ -15,6 +15,7 @@ You are the orchestrator. You read the plan, group tasks intelligently, dispatch
 **Read the plan file** if not already in context. Confirm you understand all task groups and their dependencies.
 
 **Create a branch** unless the change is trivial (single-file, cosmetic, no API surface change):
+
 ```bash
 git checkout -b <feature-slug>
 ```
@@ -72,6 +73,7 @@ Run dependent groups after their prerequisites complete. Confirm prerequisite ou
 ## Step 3 - Monitor and recover
 
 **Watch for failures.** When a sub-agent reports an error:
+
 1. The agent attempts to fix it in context - it has the most relevant state
 2. If it can't fix it, it escalates: reports the error with full output
 3. Dispatch a focused fix agent with the error context
@@ -86,7 +88,9 @@ Run dependent groups after their prerequisites complete. Confirm prerequisite ou
 All four checks must pass before the work is done. Do not mark tasks complete until verification is finished.
 
 ### 1. Automated tests
+
 Run the full test suite. All tests must pass.
+
 ```bash
 # Examples - use whatever the project's test command is
 yarn test
@@ -94,9 +98,11 @@ make test
 go test ./...
 pytest
 ```
+
 Fix failures. Never skip or suppress them.
 
 ### 2. Manual verification
+
 Actually exercise the change with realistic inputs:
 
 | Change type | How to verify |
@@ -108,7 +114,9 @@ Actually exercise the change with realistic inputs:
 | External integration | Test against the real service |
 
 ### 3. DX quality
+
 While manually testing, look for friction:
+
 - Confusing error messages
 - Inconsistent behavior across similar paths
 - Noisy or verbose output
@@ -117,7 +125,9 @@ While manually testing, look for friction:
 Fix DX issues inline. If non-trivial, document as a follow-up item. Don't ship friction.
 
 ### 4. Diff review
+
 Review the full diff against the base branch before marking done:
+
 - Error handling is complete and consistent with the codebase
 - No debug artifacts: no `console.log`, no `// TODO`, no commented-out code
 - Types are explicit - no `any`, no implicit `unknown`
@@ -134,11 +144,13 @@ Fix everything found. Don't document issues to fix later.
 2. Stage files **by name**, not `git add -A` or `git add .`
 3. Leave unrelated changes (pre-existing unstaged work) untouched
 4. Write a commit message referencing the plan:
+
    ```
    feat: <what was implemented>
 
    Implements plan: plans/YYYY-MM-DD-<feature-slug>.md
    ```
+
 5. Mark the plan file status as `[COMPLETED]`
 6. Mark all todos as `completed`
 

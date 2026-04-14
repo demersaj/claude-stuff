@@ -3,6 +3,7 @@
 ## Build Result: SUCCESS
 
 ### App Details
+
 - **App name:** vocab-flashcards
 - **Display name:** Vocabulary Flashcards
 - **Location:** `apps/vocab-flashcards/`
@@ -10,6 +11,7 @@
 - **Built file size:** 168 KB (169.01 kB reported by Vite; gzip: 52.91 kB)
 
 ### Build Command Output
+
 ```
 vite v5.4.21 building for production...
 ✓ 32 modules transformed.
@@ -41,9 +43,11 @@ dist/index.html  169.01 kB │ gzip: 52.91 kB
 | Self-contained single-file build | Done — no external URLs |
 
 ### Upload
+
 The `scripts/upload.js` file does not exist in this repository (the script directory contains other tooling but not upload.js). The build artifact at `apps/vocab-flashcards/dist/index.html` is ready for manual installation.
 
 ### Tech Stack
+
 - React 18 + Vite 5
 - `vite-plugin-singlefile` for single-file bundling
 - CSS-in-JS via `<style>` tag in App.jsx (dark mode via `prefers-color-scheme`)

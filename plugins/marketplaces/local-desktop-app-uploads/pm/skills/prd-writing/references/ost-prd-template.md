@@ -14,6 +14,7 @@ Bad: "Build a notifications system"
 Good: "Increase 7-day retention from 35% to 50% by ensuring users return to see updates relevant to them"
 
 Format:
+
 - **Outcome**: [What changes]
 - **Current state**: [Where we are today, with data]
 - **Target state**: [Where we want to be, with data]
@@ -39,6 +40,7 @@ Desired Outcome: Increase 7-day retention to 50%
 ```
 
 For each top-level opportunity, include:
+
 - **Evidence**: What data, research, or signal supports this?
 - **Size**: How many users are affected? What's the potential impact?
 
@@ -47,6 +49,7 @@ For each top-level opportunity, include:
 For each solution considered, document:
 
 **Solution A: [Name]**
+
 - **Description**: What we'd build (1-3 sentences)
 - **Addresses opportunities**: [Which opportunities from the tree]
 - **Effort estimate**: T-shirt size (S/M/L/XL) with brief justification
@@ -54,9 +57,11 @@ For each solution considered, document:
 - **Trade-offs**: What we give up by choosing this
 
 **Solution B: [Name]**
+
 - (same structure)
 
 **Solution C: [Name]**
+
 - (same structure)
 
 Use a comparison table to make the decision legible:

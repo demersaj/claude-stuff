@@ -17,6 +17,7 @@ Scaffold a new app for the webAI Apogee shell.
 3. **Scaffold the project**:
 
    **For React:**
+
    ```bash
    npm create vite@latest <app-name> -- --template react
    cd <app-name>
@@ -25,6 +26,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
    **For Vue:**
+
    ```bash
    npm create vite@latest <app-name> -- --template vue
    cd <app-name>
@@ -33,6 +35,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 4. **Patch `vite.config.js`** to use `vite-plugin-singlefile`:
+
    ```javascript
    import { defineConfig } from 'vite';
    import react from '@vitejs/plugin-react'; // or vue
@@ -49,6 +52,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 5. **Create `src/webai.js`** — shell API integration helpers:
+
    ```javascript
    // src/webai.js - webAI Apogee SDK integration helpers
 
@@ -123,6 +127,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 6. **Add the shell manifest to `index.html`** — add as the first `<script>` in `<head>`:
+
    ```html
    <script type="application/apogee-shell-manifest+json" id="apogee-shell-manifest">
    {
@@ -138,6 +143,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 7. **Add npm scripts** to `package.json`:
+
    ```json
    {
      "name": "<app-name>",
@@ -160,6 +166,7 @@ Scaffold a new app for the webAI Apogee shell.
    - Shows a "Not running in Apogee — AI features disabled" notice in dev mode (when `getSDK()` returns null)
 
 9. **Print next steps** for the user:
+
    ```
    ✅ Scaffolded <app-name> (<framework>)
 

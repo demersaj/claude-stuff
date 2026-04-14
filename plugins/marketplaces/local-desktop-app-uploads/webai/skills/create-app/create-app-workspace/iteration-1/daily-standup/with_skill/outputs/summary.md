@@ -1,6 +1,7 @@
 # Daily Standup App — Build Summary
 
 ## App Details
+
 - **Name**: Daily Standup
 - **Slug**: `daily-standup`
 - **Location**: `apps/daily-standup/`
@@ -11,6 +12,7 @@
 A standup meeting helper app where users type raw notes for yesterday, today, and blockers, then click "Format Standup" to have AI rewrite them in a clean, structured standup format. The formatted output streams token-by-token and can be copied to clipboard with one click.
 
 ### Key features implemented
+
 - Three textarea inputs: Yesterday, Today, Blockers — with descriptive placeholders
 - "Format Standup" button — disabled until at least one field has content
 - AI streaming output via `streamCompletion()` from `webai.js` — tokens appear in real-time with an animated cursor
@@ -23,10 +25,12 @@ A standup meeting helper app where users type raw notes for yesterday, today, an
 - `release()` always called in `finally` block after `host.acquire()`
 
 ### Shell APIs used
+
 - `OasisHost` — AI inference and streaming
 - `ApogeeShell` — back-to-launcher navigation
 
 ## Build Result
+
 - **Status**: SUCCESS
 - **Build command**: `npm run build`
 - **Built file**: `dist/index.html`
@@ -34,7 +38,9 @@ A standup meeting helper app where users type raw notes for yesterday, today, an
 - **Self-contained**: Yes — single HTML file with all JS and CSS inlined by `vite-plugin-singlefile`
 
 ## Skill Adherence
+
 All required skill steps were followed:
+
 1. Scaffolded with `npm create vite@latest` using `--template react`
 2. Installed `vite-plugin-singlefile`
 3. Patched `vite.config.js` with `target: esnext`, `assetsInlineLimit: 100000000`, `cssCodeSplit: false`

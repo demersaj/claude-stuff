@@ -51,6 +51,7 @@ Based on the symptom, check the known failure patterns below.
 ### BUILD FAILURES
 
 **"Cannot find module 'vite-plugin-singlefile'"**
+
 ```bash
 cd apps/<name> && npm install --save-dev vite-plugin-singlefile
 ```
@@ -72,6 +73,7 @@ The import path is wrong. Check the file actually exists at that path relative t
 ### APP NOT IN LAUNCHER / WRONG NAME
 
 **App doesn't appear after upload**
+
 - Verify `dist/index.html` exists: `ls apps/<name>/dist/index.html`
 - Check the upload script output — did it say "Uploaded" or fall back to a paste script?
 - If paste script: copy it and run it in Apogee DevTools (Cmd+Option+I → Console)
@@ -110,6 +112,7 @@ if (!sdk) { /* show dev-mode notice */ return; }
 
 **"window.OasisHost is not defined" or similar old API reference**
 The app was written using the old globals API. Migrate to `window.apogeeSDK`:
+
 - `window.OasisHost` → `sdk.intelligence`
 - `window.ApogeeShell` → `sdk.shell`
 - `window.CollaborationManager` → `sdk.room`
@@ -144,6 +147,7 @@ Verify with: `grep -c "viteSingleFile\|assetsInlineLimit" apps/<name>/vite.confi
 
 **Clicking generate has no visible effect**
 Usually one of:
+
 1. `getSDK()` returns null (local dev or `"intelligence"` not in manifest) and the app doesn't show an error
 2. The event handler isn't connected to the button
 3. `streamCompletion` is throwing but the error is swallowed
@@ -187,6 +191,7 @@ This is the legacy OasisHost API. Migrate to `streamCompletion` from `webai.js` 
 ### STORAGE NOT WORKING
 
 **`sdk.storage.save` called but data not found on reload**
+
 - Check `"storage"` is in `requires.managers` in `index.html`. Without it, `sdk.storage` is `undefined`.
 - Check `await` is used: `await sdk.storage.set(key, value)` (async method).
 - Check values are strings: `sdk.storage.set(key, JSON.stringify(obj))` — the storage API only accepts strings.
@@ -229,9 +234,11 @@ Apply the fix. Then:
 3. **Re-upload:** `node ../../scripts/upload.js`
 
 If the problem was a runtime issue (not a build error), check `dist/index.html` exists and is a single self-contained file:
+
 ```bash
 grep -c "https\?://" apps/<name>/dist/index.html
 ```
+
 Should return 0 (or only data URIs/inline sources).
 
 ## Step 5 — Report

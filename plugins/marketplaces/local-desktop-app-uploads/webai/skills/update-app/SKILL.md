@@ -70,6 +70,7 @@ Edit only what needs to change. Preserve all existing logic, state, and styling 
 **Prefer surgical edits over rewrites.** If you're adding a button, add the button and its handler — don't reconstruct the whole component. If you're fixing a bug in one function, fix that function.
 
 **Rewrite only when:**
+
 - The existing code uses the old OasisHost/ApogeeShell/CollaborationManager API — migrate to apogeeSDK fully
 - The change is structural enough that targeted edits would leave the code inconsistent
 - The user explicitly asks for a refactor or restyle
@@ -77,6 +78,7 @@ Edit only what needs to change. Preserve all existing logic, state, and styling 
 **Common change patterns:**
 
 Adding AI to an existing non-AI flow:
+
 - Add `intelligenceState` state and `onIntelligenceChange` subscription in `useEffect`
 - Add `isGenerating` state and output state
 - Import `streamCompletion` and `onIntelligenceChange` from `./webai.js`
@@ -84,16 +86,19 @@ Adding AI to an existing non-AI flow:
 - Ensure `"intelligence"` is in the manifest managers
 
 Adding persistence:
+
 - Add `"storage"` to manifest managers
 - Create `src/memory.js` from the `add-memory` skill template
 - Load on mount, save on change
 
 Adding a feature:
+
 - Add state, handler, and JSX for the new feature
 - Import any new helpers from `webai.js`, `persona.js`, `memory.js`, or `collab.js`
 - Don't disturb existing state/handlers unless they conflict
 
 Fixing a bug:
+
 - Read the exact broken code, diagnose the root cause
 - Fix the specific logic — don't reorganize surrounding code
 

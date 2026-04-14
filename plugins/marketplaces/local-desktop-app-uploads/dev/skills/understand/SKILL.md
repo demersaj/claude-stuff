@@ -13,6 +13,7 @@ Ground yourself in the codebase before touching anything. The goal is to underst
 ## Step 1 - Project instructions
 
 Read `CLAUDE.md` (or `.claude/CLAUDE.md`) if it exists. This is the authoritative source for:
+
 - Build and test commands
 - Architecture overview
 - Conventions and patterns
@@ -25,6 +26,7 @@ If multiple `CLAUDE.md` files exist (root + subdirectory), read both. The subdir
 ## Step 2 - Identify affected subsystems
 
 From the PRD, feature spec, or task description, identify:
+
 - Which directories and files will need to change
 - Which modules they depend on
 - Which modules depend on them (downstream impact)
@@ -58,6 +60,7 @@ Do not skim. Read the actual code. Patterns that aren't obvious from file names 
 ## Step 4 - Map dependencies
 
 Before planning any changes, understand:
+
 - What does the affected code import from?
 - What imports from the affected code?
 - Are there shared types or interfaces that will need updating?
@@ -83,6 +86,7 @@ Record anything that will constrain implementation:
 After reading the codebase, surface only the questions that would meaningfully change the implementation approach. Avoid asking about things inferable from the code or PRD.
 
 Use `AskUserQuestion` with:
+
 - Clear option labels
 - Tradeoff descriptions for each option
 - `multiSelect: true` for independent choices, single-select for mutually exclusive ones

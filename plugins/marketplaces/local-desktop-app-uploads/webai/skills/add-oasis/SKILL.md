@@ -22,6 +22,7 @@ Add AI inference via `sdk.intelligence` to a webAI app component or file.
 5. **Framework detection** — read `package.json` to determine React or Vue.
 
 6. **For React** — add to the target component:
+
    ```jsx
    import { streamCompletion, getIntelligenceState, onIntelligenceChange, cancelGeneration } from './webai.js';
 
@@ -58,6 +59,7 @@ Add AI inference via `sdk.intelligence` to a webAI app component or file.
    ```
 
 7. **For Vue** — add to the target component:
+
    ```javascript
    // In <script setup>
    import { streamCompletion, getIntelligenceState, onIntelligenceChange, cancelGeneration } from './webai.js';
@@ -91,6 +93,7 @@ Add AI inference via `sdk.intelligence` to a webAI app component or file.
    ```
 
 8. **Add status indicator and stop button to the template/JSX**:
+
    ```jsx
    <span className={`ai-status ai-status--${intelligenceState}`}>
      {intelligenceState === 'ready' ? '● Ready' : intelligenceState === 'loading' ? '◌ Loading…' : '○ Waiting'}

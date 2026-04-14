@@ -23,6 +23,7 @@ Ask which format fits this work:
 ## Output
 
 Create the PRD as a markdown file in the current directory:
+
 - Name it descriptively: `prd-<feature-name>.md`
 - Use the appropriate template from `pm:prd-writing` skill
 

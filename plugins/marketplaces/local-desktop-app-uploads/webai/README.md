@@ -42,6 +42,7 @@ cp -r webai-plugin ~/.claude/plugins/webai
 ```
 
 Or from inside Claude Code:
+
 ```
 /plugin add ./webai-plugin
 ```
@@ -95,6 +96,7 @@ All APIs are null in local dev (outside Apogee). The `src/webai.js` helper handl
 ## Templates
 
 The `templates/` directory contains:
+
 - `webai.js` - Shell API helpers (copied to `src/webai.js` in new apps)
 - `react/App.jsx` - React starter with intelligence subscribe and back button
 - `vue/App.vue` - Vue starter with intelligence subscribe and back button

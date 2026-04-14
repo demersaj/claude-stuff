@@ -1,9 +1,11 @@
 # Vocab Flashcards App — Build Summary
 
 ## App location
+
 `/Users/huxley-47/dev/webai/webai/apps/vocab-flashcards/`
 
 ## Build output
+
 `apps/vocab-flashcards/dist/index.html` — 158.60 kB (gzip: 50.55 kB), fully self-contained single HTML file.
 
 ## Features implemented
@@ -38,12 +40,14 @@
   - Loaded on startup; falls back to 3 default words if empty
 
 ## Tech stack
+
 - React 18 + Vite 5
 - `vite-plugin-singlefile` → single self-contained `dist/index.html`
 - Pure CSS (dark theme, no external UI library)
 - `window.OasisHost` for AI (webAI shell API)
 
 ## Files
+
 - `src/App.jsx` — all app logic and components (~220 LOC)
 - `src/index.css` — full dark-theme stylesheet
 - `src/main.jsx` — React root mount

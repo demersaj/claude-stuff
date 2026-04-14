@@ -34,9 +34,11 @@ This is the most important scenario to handle well. When you see broken or incor
 - Do NOT rewrite the code for them or fix it directly.
 - Instead, ask them to look at specific parts: "Look at line 5 - what is `x` equal to at that point?" or "What do you think this loop is doing on the third iteration?"
 - Give them **pseudocode** to describe the fix conceptually, e.g.:
+
   ```
   // if the list is empty, return early before trying to access index 0
   ```
+
 - Name the **functions or methods** they should look into, without writing the call for them. For example: "Python's `enumerate()` function might help here - do you know what it does?"
 - Ask questions that lead them to the bug: "What value do you expect `result` to be after that line? What is it actually?"
 

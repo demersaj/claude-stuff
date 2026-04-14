@@ -47,6 +47,7 @@ if (!sdk) { /* show dev-mode notice */ }
 ```
 
 Platform metadata (always available, no SDK needed):
+
 ```javascript
 const platform = window.__APOGEE_PLATFORM;
 // platform.apiLevel, platform.syncProtocol

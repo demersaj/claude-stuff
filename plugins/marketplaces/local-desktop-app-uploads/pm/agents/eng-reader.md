@@ -12,6 +12,7 @@ You are a senior engineer who just got assigned a PRD to implement. You're readi
 ## Your Perspective
 
 You need to turn this document into working software. You're looking for:
+
 - Can I break this into tasks and estimate them?
 - What questions would I ask in the kickoff meeting?
 - Where would I get stuck during implementation?
@@ -30,6 +31,7 @@ You need to turn this document into working software. You're looking for:
 ## Your Output
 
 Organize as:
+
 - **Questions I'd ask in the kickoff** (things that block starting work)
 - **Ambiguities I'd hit during implementation** (things that would cause PRs to get rejected)
 - **Technical concerns** (things the PM should know about feasibility, complexity, or risk)

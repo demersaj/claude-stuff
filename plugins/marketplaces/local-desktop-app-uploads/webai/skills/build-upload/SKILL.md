@@ -16,17 +16,21 @@ Build the current app and install it directly into the running Apogee shell.
 2. **Verify vite.config** uses `vite-plugin-singlefile`. If not, patch it automatically.
 
 3. **Run the build:**
+
    ```bash
    npm run build
    ```
+
    If the build fails, show the error and stop.
 
 4. **Verify output** - check that `dist/index.html` exists and is a self-contained file (no external script/link tags pointing to relative paths).
 
 5. **Run the upload script:**
+
    ```bash
    node ../../scripts/upload.js
    ```
+
    The upload script lives at `<repo-root>/scripts/upload.js`. It:
    - POSTs `{ name, html }` to `http://127.0.0.1:44280/install` - the local install server the Tauri app exposes
    - The Tauri server calls `window.ApogeeShell.uploadApp()` in the running shell webview directly
@@ -37,12 +41,14 @@ Build the current app and install it directly into the running Apogee shell.
 6. **Report the outcome clearly:**
 
    When Tauri app is running (direct install):
+
    ```
    ✅ Build complete: dist/index.html (<size> KB)
    ✅ "<display-name>" installed directly into Apogee - refresh the launcher.
    ```
 
    When Tauri app is not running (fallback paste):
+
    ```
    ✅ Build complete: dist/index.html (<size> KB)
    ⚠️  Tauri app not running - paste the script printed above into:

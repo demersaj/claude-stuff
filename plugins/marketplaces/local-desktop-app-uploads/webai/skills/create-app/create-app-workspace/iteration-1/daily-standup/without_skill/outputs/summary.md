@@ -1,6 +1,7 @@
 # Daily Standup App — Build Summary
 
 ## App
+
 **Name:** daily-standup
 **Location:** `/Users/huxley-47/dev/webai/webai/apps/daily-standup/`
 **Description:** AI-powered daily standup formatter

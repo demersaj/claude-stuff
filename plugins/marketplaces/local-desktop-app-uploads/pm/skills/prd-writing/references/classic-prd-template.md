@@ -9,6 +9,7 @@ Use this template when the solution direction is reasonably clear and you need t
 ### Problem Statement (required)
 
 Write 2-4 sentences max. Answer:
+
 - What is the current state?
 - What is the pain or gap?
 - Who feels it?
@@ -40,13 +41,16 @@ Be specific. Not "all users" but segments with different needs:
 Use MoSCoW prioritization:
 
 **P0 - Must Have**: Ship is blocked without these
+
 - Requirement with clear acceptance criteria
 - Another requirement with clear acceptance criteria
 
 **P1 - Should Have**: Significantly reduces value if missing
+
 - Requirement with acceptance criteria
 
 **P2 - Nice to Have**: Adds polish, can be cut without impacting launch
+
 - Requirement with acceptance criteria
 
 Each requirement should be testable. "The page loads quickly" is not testable. "The page loads in under 2 seconds on 3G connections" is testable.
@@ -62,6 +66,7 @@ Each requirement should be testable. "The page loads quickly" is not testable. "
 ### Technical Approach (recommended)
 
 High-level only in the PRD. Cover:
+
 - Architecture direction (not implementation details)
 - Key technical decisions and rationale
 - Integration points

@@ -18,6 +18,7 @@ Scaffold a new app for the webAI Apogee shell.
 3. **Scaffold the project**:
 
    **For React:**
+
    ```bash
    npm create vite@latest <app-name> -- --template react
    cd <app-name>
@@ -26,6 +27,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
    **For Vue:**
+
    ```bash
    npm create vite@latest <app-name> -- --template vue
    cd <app-name>
@@ -34,6 +36,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 4. **Patch `vite.config.js`** to use `vite-plugin-singlefile`:
+
    ```javascript
    import { defineConfig } from 'vite';
    import react from '@vitejs/plugin-react'; // or vue
@@ -50,6 +53,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 5. **Add the shell manifest to `index.html`** — insert as the first `<script>` in `<head>`:
+
    ```html
    <script type="application/apogee-shell-manifest+json" id="apogee-shell-manifest">
    {
@@ -63,9 +67,11 @@ Scaffold a new app for the webAI Apogee shell.
    }
    </script>
    ```
+
    Add more managers as needed: `"storage"`, `"room"`, `"personas"`, `"identity"`, `"theme"`.
 
 6. **Create `src/webai.js`** - SDK integration layer:
+
    ```javascript
    // src/webai.js — webAI Apogee SDK integration helpers
 
@@ -134,6 +140,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 7. **Add npm scripts** to `package.json`:
+
    ```json
    {
      "scripts": {
@@ -157,6 +164,7 @@ Scaffold a new app for the webAI Apogee shell.
    - **If no description**: use a minimal placeholder main content area.
 
    **React intelligence state pattern (subscribe, not polling):**
+
    ```jsx
    const [intelligenceState, setIntelligenceState] = useState('waiting');
    useEffect(() => {
@@ -166,6 +174,7 @@ Scaffold a new app for the webAI Apogee shell.
    ```
 
 9. **Print next steps** for the user:
+
    ```
    ✅ Scaffolded <app-name> (<framework>)
 

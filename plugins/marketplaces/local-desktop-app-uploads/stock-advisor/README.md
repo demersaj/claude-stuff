@@ -10,6 +10,7 @@ Analyzes any stock or company - public **or** private - and produces a structure
 | `/stock-advisor:gaps [holdings]` | Map sector/theme exposure gaps from your list or portfolio; suggest new stocks (and run `/stock-advisor:analyze` on finalists) |
 
 **Examples:**
+
 ```
 /stock-advisor:analyze AAPL
 /stock-advisor:analyze Stripe

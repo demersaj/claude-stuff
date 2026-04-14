@@ -22,6 +22,7 @@ The 60-turn limit is enforced by trimming the array before saving — oldest tur
 ## Step 1 — Read the target file
 
 Read the component specified (or ask). Understand how the app currently calls `streamCompletion` — the main changes are:
+
 1. Adding `sdk.storage` for persistence
 2. Passing `priorMessages` to `streamCompletion` for context
 
@@ -184,6 +185,7 @@ async function handleClear() {
 ```
 
 **Render the history:**
+
 ```jsx
 <div className="chat-history">
   {turns.map((turn, i) => (

@@ -31,9 +31,9 @@ Read a PRD and generate a set of implementable user stories.
 **Notes:** [implementation hints, edge cases]
 ```
 
-4. **Order stories** within each epic by dependency chain, then priority
-5. **Flag** any requirement that's too large for a single story (needs decomposition)
-6. **Identify** technical enabler stories (infrastructure, migrations, etc.) that aren't in the PRD but are needed
+1. **Order stories** within each epic by dependency chain, then priority
+2. **Flag** any requirement that's too large for a single story (needs decomposition)
+3. **Identify** technical enabler stories (infrastructure, migrations, etc.) that aren't in the PRD but are needed
 
 ## Output
 

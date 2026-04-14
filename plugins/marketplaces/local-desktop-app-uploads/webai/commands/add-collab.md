@@ -17,6 +17,7 @@ Add real-time P2P collaboration via `sdk.room` to a webAI app.
 3. **Check the shell manifest** in `index.html` — ensure `"room"` (and `"identity"` if showing user names) are listed in `requires.managers`. Add them if missing.
 
 4. **Create `src/collab.js`** — a null-safe wrapper around `sdk.room`:
+
    ```javascript
    // src/collab.js - webAI room collaboration helpers via apogeeSDK
 
@@ -86,6 +87,7 @@ Add real-time P2P collaboration via `sdk.room` to a webAI app.
    ```
 
 5. **For React** — add room state management to the target component:
+
    ```jsx
    import { hostRoom, joinRoom, disconnectRoom, getRoomState, getRoomUsers, onRoomEvent, getIdentity } from './collab.js';
 
@@ -119,6 +121,7 @@ Add real-time P2P collaboration via `sdk.room` to a webAI app.
    ```
 
 6. **For Vue** — add to `<script setup>`:
+
    ```javascript
    import { hostRoom, joinRoom, disconnectRoom, getRoomState, getRoomUsers, onRoomEvent, getIdentity } from './collab.js';
 

@@ -78,11 +78,13 @@ Before starting, read:
 ## Task rules
 
 Every task must have:
+
 1. **An imperative action** - "Add", "Update", "Refactor", "Delete", "Wire up"
 2. **An explicit file path** - never "the auth module" or "the relevant file"
 3. **A verify step** - a shell command, a curl, a test filter, or a specific observable check
 
 Never write a verify step that says "check that it works" or "confirm the feature is functional". Be specific:
+
 - `yarn test --testPathPattern=auth`
 - `curl -X POST localhost:3000/api/login -d '{"email":"test@test.com","password":"pw"}'`
 - `make verify`

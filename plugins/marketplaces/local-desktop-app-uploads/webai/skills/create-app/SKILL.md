@@ -15,6 +15,7 @@ Turn a plain-English idea into a fully-working Apogee shell app — scaffolded, 
 ## Step 1 — Understand the idea
 
 Parse the argument (or ask if missing). Figure out:
+
 - **What the app does** — the core loop a user would go through
 - **Which SDK APIs it needs** (see API reference below) — most apps need `intelligence`; some need `storage`, `room`, `personas`, or `identity`
 - **App name** — derive a short `kebab-case` slug (e.g. "Pomodoro Coach" → `pomodoro-coach`)
@@ -173,6 +174,7 @@ Replace the boilerplate `src/App.jsx` with a **real, working implementation** ba
 ### Every app must have
 
 **Header** — a thin bar at the top with:
+
 - App title (left)
 - AI status badge: a small colored dot + label (`● ready` / `◌ loading…` / `○ waiting`) driven by subscribing to `onIntelligenceChange`
 - Back button (right): `← Launcher` that calls `goToLauncher()`
@@ -235,6 +237,7 @@ Inline a `<style>` block or use a separate `src/App.css` with CSS custom propert
 ### Build for the description
 
 Think about what the user actually wants to do in this app. Don't just add a text input and a submit button and call it done. Structure the UI around the actual task:
+
 - A **Pomodoro timer** needs a prominent countdown, start/stop/reset, session counter, and an AI "coach" panel for encouragement
 - A **Kanban board** needs columns, draggable cards, an add-card flow, and an AI suggestion per card
 - A **Writing assistant** needs an editor area, a prompt form, and a streaming response panel beside it
