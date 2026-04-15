@@ -1,5 +1,5 @@
 {
-  "skill_name": "webai:create-app",
+  "skill_name": "webai:new-app",
   "evals": [
     {
       "id": 0,

@@ -6,11 +6,12 @@ Build and deploy React or Vue apps to the webAI Apogee shell.
 
 | Command | What it does |
 |---------|-------------|
-| `/webai:create-app <description>` | Idea → full working app → upload in one shot |
-| `/webai:new-app <name> [react\|vue]` | Scaffold a new Vite app wired to Apogee shell APIs |
+| `/webai:new-app <name> [react\|vue] [--description "..."]` | Scaffold a new Vite app wired to Apogee shell APIs; if `--description` is given, implements real UI |
+| `/webai:new-app "<plain-English description>"` | Idea → full working app → upload in one shot |
 | `/webai:update-app <app> <change>` | Modify an existing app, rebuild, and upload |
 | `/webai:debug-app <app> [symptom]` | Diagnose and fix a broken app |
 | `/webai:build-upload [--open]` | Build to single HTML, install into running Apogee Tauri shell (or paste script) |
+| `/webai:webai-app [topic]` | Look up the full webAI Apogee SDK reference (manifest, facades, `webai.js`, Vite config) |
 | `/webai:add-oasis [file]` | Add `sdk.intelligence` AI inference wiring to a component |
 | `/webai:add-collab [file]` | Add `sdk.room` P2P collaboration wiring to a component |
 | `/webai:add-persona [file]` | Add Apogee persona support to an existing app |
@@ -22,8 +23,7 @@ Agent skills (auto-triggered in Cursor/Claude Code when relevant):
 
 | Skill | What it does |
 |-------|---------------|
-| **create-app** | Idea → full working app → upload in one shot. Scaffold, implement real UI, build, upload |
-| **new-app** | Scaffold a new React or Vue app for the webAI Apogee shell |
+| **new-app** | Scaffold a new React or Vue app, or build a complete app from a plain-English description and upload in one shot. The single build command — handles both scaffold and create-from-idea modes |
 | **update-app** | Modify an existing app (add feature, fix bug, restyle), rebuild, and upload |
 | **debug-app** | Diagnose and fix broken apps — build failures, runtime crashes, AI not working, upload errors |
 | **build-upload** | Build the current webAI app to a single HTML file and upload it directly to the running Apogee Tauri shell |
@@ -50,11 +50,11 @@ Or from inside Claude Code:
 ## Typical workflows
 
 ```bash
-# Build a new app from scratch (recommended)
-/webai:create-app a pomodoro timer with AI encouragement
+# Build a new app from scratch (create mode — scaffold, implement, build, upload)
+/webai:new-app "a pomodoro timer with AI encouragement"
 
-# Or scaffold manually, then build
-/webai:new-app my-tool react
+# Scaffold only (explicit name; add --description to generate real UI)
+/webai:new-app my-tool react --description "A kanban board with AI suggestions"
 # ... edit src/App.jsx ...
 /webai:build-upload
 
@@ -69,6 +69,9 @@ Or from inside Claude Code:
 
 # Fix a broken app
 /webai:debug-app my-app the AI button does nothing
+
+# Look up SDK reference before building
+/webai:webai-app intelligence
 ```
 
 ## How uploads work

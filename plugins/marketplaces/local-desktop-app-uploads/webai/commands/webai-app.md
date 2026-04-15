@@ -4,7 +4,7 @@ argument-hint: "[topic or facade name]"
 allowed-tools: Read
 ---
 
-Present the webAI Apogee SDK reference below to the user. If an argument was provided (e.g. `intelligence`, `storage`, `room`, `manifest`, `webai.js`, `vanilla`), focus on that section. For `vanilla`, also read `skills/webai-app/references/vanilla-template.html` and present it. Otherwise present the full reference.
+This is the `webai:webai-app` command. Present the webAI Apogee SDK reference below to the user. If an argument was provided (e.g. `intelligence`, `storage`, `room`, `manifest`, `webai.js`, `vanilla`), focus on that section. For `vanilla`, also read `skills/webai-app/references/vanilla-template.html` and present it. Otherwise present the full reference.
 
 ---
 

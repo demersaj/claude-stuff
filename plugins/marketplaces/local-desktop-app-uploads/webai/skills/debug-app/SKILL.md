@@ -57,7 +57,7 @@ cd apps/<name> && npm install --save-dev vite-plugin-singlefile
 ```
 
 **"Cannot find module './webai.js'" or similar missing import**
-Check if `src/webai.js` exists. If not, create it from the canonical template (see the `create-app` skill reference). Also check for typos in import paths — casing matters on Linux.
+Check if `src/webai.js` exists. If not, create it from the canonical template (see the `new-app` or `webai-app` skill reference). Also check for typos in import paths — casing matters on Linux.
 
 **"X is declared but never used" / "Y is assigned but value never used"**
 Remove the unused variable or import. In strict Vite builds these are errors, not warnings.

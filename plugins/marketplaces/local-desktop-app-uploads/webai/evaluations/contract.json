@@ -103,8 +103,8 @@
   ],
   "commandSkillRefs": [
     {
-      "file": "commands/create-app.md",
-      "pattern": "webai:create-app"
+      "file": "commands/new-app.md",
+      "pattern": "webai:new-app"
     },
     {
       "file": "commands/debug-app.md",

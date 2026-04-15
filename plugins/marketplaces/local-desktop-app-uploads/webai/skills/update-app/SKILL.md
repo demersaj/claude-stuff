@@ -61,7 +61,7 @@ If the description is ambiguous (e.g. "make it better"), ask one focused questio
 
 If a manager is needed but not in the manifest, add it to `requires.managers` in `index.html`.
 
-**Check the webai.js version** — if the app has an old-style `webai.js` using `window.OasisHost`, `window.ApogeeShell`, etc., migrate it to the current `window.apogeeSDK` pattern before adding new features. The canonical template is in the `create-app` skill. This is a prerequisite, not optional.
+**Check the webai.js version** — if the app has an old-style `webai.js` using `window.OasisHost`, `window.ApogeeShell`, etc., migrate it to the current `window.apogeeSDK` pattern before adding new features. The canonical template is in the `new-app` skill (full API reference in `webai-app`). This is a prerequisite, not optional.
 
 ## Step 4 — Make targeted edits
 
@@ -106,7 +106,7 @@ Fixing a bug:
 
 If the change involves any SDK API, verify `src/webai.js`:
 
-1. **Exists** — if not, create it from the canonical template (see `create-app` skill)
+1. **Exists** — if not, create it from the canonical template (see `new-app` or `webai-app` skill)
 2. **Uses `window.apogeeSDK`** — not `window.OasisHost` or any old globals
 3. **Exports what's needed** — `getSDK`, `streamCompletion`, `getIntelligenceState`, `onIntelligenceChange`, `cancelGeneration`, `goToLauncher`
 
