@@ -240,7 +240,39 @@ useEffect(() => {
 
 ---
 
-## Step 5 — Add minimal CSS
+## Step 5 — Styling
+
+**If the app uses Signal Design System** (check `package.json` for `@webai/signal-ui`), use Signal components and token-backed Tailwind classes instead of raw CSS — no separate stylesheet needed. Render history with the token classes:
+
+```jsx
+import { Button, Textarea } from '@webai/signal-ui'; // use whatever Signal exports — verify in llms.txt
+
+<div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
+  {turns.map((turn, i) => (
+    <div
+      key={i}
+      className={`flex flex-col gap-1 max-w-[80%] ${turn.role === 'user' ? 'self-end items-end' : 'self-start'}`}
+    >
+      <span className="text-xs uppercase tracking-wide text-muted-foreground">
+        {turn.role === 'user' ? 'You' : 'AI'}
+      </span>
+      <p className={`rounded-md px-3.5 py-2.5 whitespace-pre-wrap ${
+        turn.role === 'user'
+          ? 'bg-primary text-primary-foreground'
+          : 'bg-muted text-foreground'
+      }`}>
+        {turn.content}
+      </p>
+      <span className="text-xs text-muted-foreground/60">{formatTurnTime(turn.at)}</span>
+    </div>
+  ))}
+  {isGenerating && <div className="self-start opacity-50">●●●</div>}
+</div>
+```
+
+Use Signal's `Button` and `Textarea` (or whatever the current `llms.txt` exports) for the input row instead of raw `<button>`/`<textarea>`.
+
+**If the app does not use Signal** — add minimal CSS using design tokens from `@webai/signal-token` (or the app's existing custom properties):
 
 ```css
 .chat-history {
@@ -258,13 +290,13 @@ useEffect(() => {
 
 .turn-role { font-size: 11px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.05em; }
 .turn-text {
-  background: var(--surface);
-  border-radius: var(--radius);
+  background: var(--muted, #f5f5f5);
+  border-radius: var(--radius, 8px);
   padding: 10px 14px;
   margin: 0;
   white-space: pre-wrap;
 }
-.turn-user .turn-text { background: var(--accent); color: #fff; }
+.turn-user .turn-text { background: var(--primary, #2563eb); color: var(--primary-foreground, #fff); }
 .turn-time { font-size: 11px; opacity: 0.4; }
 
 .generating { opacity: 0.5; }
@@ -290,3 +322,4 @@ node ../../scripts/upload.js
 - `toMessageContext` limits history to 20 turns by default — this prevents exceeding the model's context window. Adjust the limit for long-context models.
 - Don't call `clearHistory` without explicit user action (a button). Clearing is permanent.
 - Optimistically update the UI (add user turn immediately, stream assistant turn in place) — don't wait for the request to finish before showing anything.
+- If the app uses Signal Design System (`@webai/signal-ui` in `package.json`), use Signal components (`Button`, `Textarea`, etc. — verify names in `node_modules/@webai/signal-ui/llms.txt`) and token-backed Tailwind classes (`bg-muted`, `bg-primary`, `text-muted-foreground`). Never hardcode colors.

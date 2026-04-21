@@ -61,6 +61,12 @@ If the description is ambiguous (e.g. "make it better"), ask one focused questio
 
 If a manager is needed but not in the manifest, add it to `requires.managers` in `index.html`.
 
+**Check if the app uses Signal Design System.** Look for `@webai/signal-ui` in `package.json` dependencies:
+
+- **Signal present** — every new UI element MUST use Signal components (`Button`, `Card`, `Input`, `Dialog`, etc.) and token-backed Tailwind classes (`bg-background`, `text-foreground`, `bg-primary`, `border-border`). Before adding UI, read `node_modules/@webai/signal-ui/llms.txt` for the current API. Never hardcode colors, never invent component names.
+- **Signal absent, UI change requested, and app is React** — offer to add Signal as part of the change (install `@webai/signal-ui @webai/signal-token tailwindcss @tailwindcss/vite`, update `vite.config.js`, wrap in `ThemeProvider`, import styles). If the user declines or it would bloat the diff, stay consistent with the app's existing CSS approach.
+- **Signal absent, non-UI change** — leave styling alone.
+
 **Check the webai.js version** — if the app has an old-style `webai.js` using `window.OasisHost`, `window.ApogeeShell`, etc., migrate it to the current `window.apogeeSDK` pattern before adding new features. The canonical template is in the `new-app` skill (full API reference in `webai-app`). This is a prerequisite, not optional.
 
 ## Step 4 — Make targeted edits
@@ -163,3 +169,4 @@ To keep iterating:
 - If the app uses old globals (`window.OasisHost`, etc.), migrate `webai.js` fully to `window.apogeeSDK` before building on top of it — don't mix the two APIs.
 - If the app doesn't have `webai.js` but the change needs SDK APIs, create it from the canonical template rather than inlining the logic in `App.jsx`.
 - Don't add new features beyond what was asked. If you notice something broken while making the change, fix it only if it's in the same area of code you're already touching — otherwise note it in the report.
+- If the app already uses Signal, all new UI must use Signal components and token-backed Tailwind classes — never mix in raw hex colors or another UI library. Read `node_modules/@webai/signal-ui/llms.txt` before adding any component.

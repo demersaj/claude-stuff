@@ -200,7 +200,7 @@ async function generate(prompt) {
   }
 }
 
-// Render a simple picker
+// Render a simple picker (raw HTML — see Signal version below if app uses Signal)
 <select onChange={e => {
   const p = personas.find(p => p.id === e.target.value);
   if (p) handleSelectPersona(p);
@@ -213,6 +213,8 @@ async function generate(prompt) {
   ))}
 </select>
 ```
+
+**If the app uses Signal Design System** (`@webai/signal-ui` in `package.json`), use Signal's select/dropdown primitive instead of a raw `<select>` — check `node_modules/@webai/signal-ui/llms.txt` for the current component name (commonly `Select`, `Combobox`, or similar). Do not invent component names.
 
 ### Pattern C — Active persona display only
 
@@ -263,3 +265,4 @@ node ../../scripts/upload.js
 - Don't show persona selection UI when `listPersonas()` returns an empty array — hide or disable it gracefully.
 - Subscribe to `onPersonasChange` to keep the UI in sync when the user changes their persona settings in the shell.
 - `getAppActivePersona(appId)` (from `sdk.intelligence`) gives the persona scoped to a specific app. `getActivePersona()` (from `sdk.personas`) gives the global shell selection.
+- If the app uses Signal Design System, render the persona picker with Signal's select/dropdown primitive and persona badges with Signal `Badge` — look up exact component names in `node_modules/@webai/signal-ui/llms.txt`. Use token classes (`bg-muted`, `text-foreground`) rather than hardcoded colors.

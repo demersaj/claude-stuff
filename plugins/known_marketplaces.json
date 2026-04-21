@@ -5,7 +5,7 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/huxley-47/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-04-08T16:00:44.625Z"
+    "lastUpdated": "2026-04-21T18:03:05.913Z"
   },
   "local-desktop-app-uploads": {
     "source": {
@@ -15,5 +15,21 @@
     "installLocation": "/Users/huxley-47/.claude/plugins/marketplaces/local-desktop-app-uploads",
     "lastUpdated": "2026-02-27T14:56:28.833Z",
     "autoUpdate": true
+  },
+  "claude-code-warp": {
+    "source": {
+      "source": "github",
+      "repo": "warpdotdev/claude-code-warp"
+    },
+    "installLocation": "/Users/huxley-47/.claude/plugins/marketplaces/claude-code-warp",
+    "lastUpdated": "2026-04-21T17:56:39.945Z"
+  },
+  "thedotmack": {
+    "source": {
+      "source": "github",
+      "repo": "thedotmack/claude-mem"
+    },
+    "installLocation": "/Users/huxley-47/.claude/plugins/marketplaces/thedotmack",
+    "lastUpdated": "2026-04-21T17:57:02.141Z"
   }
 }

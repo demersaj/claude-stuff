@@ -18,6 +18,8 @@
 
 # embedded git repo (track separately or add as submodule if needed)
 plugins/marketplaces/claude-plugins-official
+plugins/marketplaces/claude-code-warp
+plugins/marketplaces/thedotmack
 
 # backup folder (do not track)
 plugins/webai.bak/

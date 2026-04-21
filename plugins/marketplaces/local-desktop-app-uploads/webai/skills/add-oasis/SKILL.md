@@ -114,3 +114,4 @@ Add AI inference via `sdk.intelligence` to a webAI app component or file.
 - Customize the system prompt placeholder to match the app's apparent purpose.
 - Add a cancel/stop button when `isGenerating` is true — `cancelGeneration()` stops the stream without crashing.
 - Always clean up the subscribe unsubscribe on unmount.
+- If the app uses Signal Design System (`@webai/signal-ui` in `package.json`), render the status indicator and stop button with Signal components (`Badge`, `Button`) and token-backed Tailwind classes (`bg-muted`, `text-foreground`) — never hardcode colors. Look up component names in `node_modules/@webai/signal-ui/llms.txt`.

@@ -211,6 +211,51 @@ if (sdk?.storage) {
 
 ---
 
+### SIGNAL DESIGN SYSTEM ISSUES
+
+**"401 Unauthorized" or "404 Not Found" installing `@webai/signal-ui` or `@webai/signal-token`**
+Missing or wrong `.npmrc`. The app root must have:
+
+```
+@webai:registry=https://gitlab.com/api/v4/projects/74115605/packages/npm/
+```
+
+No auth token needed — this registry is public. Run `npm install` again after adding the file.
+
+**Tailwind classes don't apply at runtime (layout looks unstyled)**
+
+- `@tailwindcss/vite` plugin missing from `vite.config.js` — add `import tailwindcss from '@tailwindcss/vite'` and include `tailwindcss()` in `plugins`.
+- Entry CSS not imported. Verify `src/main.jsx` (or equivalent) has `import './index.css';` (or whatever file contains the `@import "tailwindcss"` line).
+- `index.css` missing the Signal imports. It must include:
+
+  ```css
+  @import "tailwindcss";
+  @import "@webai/signal-token/tailwind";
+  @import "@webai/signal-ui/styles";
+  ```
+
+**"Module not found: @webai/signal-ui" at build time**
+Package isn't installed in this app. Run `npm install @webai/signal-ui @webai/signal-token` from the app directory (not repo root).
+
+**Colors look wrong / theme not matching Apogee**
+Hardcoded hex colors or non-token Tailwind classes (`bg-gray-100`, `bg-[#1a1a1a]`). Replace with token classes: `bg-background`, `text-foreground`, `bg-primary`, `bg-muted`, `border-border`. Tokens auto-swap on theme change; hex values don't.
+
+**`useTheme()` throws or returns undefined**
+App isn't wrapped in `ThemeProvider`. In the app entry (`src/main.jsx`):
+
+```jsx
+import { ThemeProvider } from '@webai/signal-ui';
+
+<ThemeProvider>
+  <App />
+</ThemeProvider>
+```
+
+**"Component X is not exported from @webai/signal-ui"**
+Invented component name. Run `cat node_modules/@webai/signal-ui/llms.txt` to see what's actually exported, and replace the import.
+
+---
+
 ### UPLOAD / INSTALL ERRORS
 
 **"dist/index.html not found"**
@@ -278,3 +323,5 @@ When the symptom is vague ("it's broken", "something's wrong"), check these in o
 - [ ] `onIntelligenceChange` subscription cleaned up on unmount (not polling with `setInterval`)
 - [ ] Error state is shown in the UI (`catch (e) { setOutput(e.message) }`)
 - [ ] `dist/index.html` exists and was built recently (`ls -lh apps/<name>/dist/`)
+- [ ] If using Signal: `.npmrc` present with `@webai` registry, `@tailwindcss/vite` in `vite.config.js`, Signal imports in entry CSS, `ThemeProvider` wraps the app
+- [ ] If using Signal: only token classes used for color (`bg-background`, `text-foreground`, `bg-primary`, `border-border`) — no hardcoded hex or non-token Tailwind color classes

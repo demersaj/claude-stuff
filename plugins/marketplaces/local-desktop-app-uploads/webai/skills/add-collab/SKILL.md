@@ -209,3 +209,4 @@ function handleSend() {
 - Always return the `onRoomEvent` unsubscribe and call it on unmount to avoid listener leaks.
 - The `roomCode` returned by `sdk.room.host()` is the short string peers use to join — show it to the user so they can share it.
 - Never expose room passwords in the UI or localStorage.
+- If the app uses Signal Design System (`@webai/signal-ui` in `package.json`), render room controls, user chips, and chat input with Signal components (`Button`, `Input`, `Card`, `Badge` — verify in `node_modules/@webai/signal-ui/llms.txt`) and token-backed Tailwind classes (`bg-card`, `border-border`, `text-muted-foreground`). Never hardcode colors.

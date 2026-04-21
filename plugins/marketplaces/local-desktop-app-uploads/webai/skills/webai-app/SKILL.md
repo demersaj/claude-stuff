@@ -484,10 +484,11 @@ const unsub = sdk.messaging.subscribe(handler);
 // vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite'; // only if using Signal/Tailwind
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig({
-  plugins: [react(), viteSingleFile()],
+  plugins: [react(), tailwindcss(), viteSingleFile()],
   build: {
     target: 'esnext',
     assetsInlineLimit: 100000000,
@@ -495,6 +496,91 @@ export default defineConfig({
   },
 });
 ```
+
+## Signal Design System (canonical UI layer)
+
+Signal is the design system used across Apogee and the default UI toolkit for React apps. It ships token-backed components that automatically match the shell's light/dark theme — no custom theming required.
+
+**Stack:** React 19+, TypeScript (optional), Tailwind CSS v4.
+
+### Setup
+
+Add `.npmrc` at the app root (public registry, no auth):
+
+```
+@webai:registry=https://gitlab.com/api/v4/projects/74115605/packages/npm/
+```
+
+Install:
+
+```bash
+npm install @webai/signal-ui @webai/signal-token
+npm install --save-dev tailwindcss @tailwindcss/vite
+```
+
+### Styles
+
+In the app entry CSS (e.g. `src/index.css`):
+
+```css
+@import "tailwindcss";
+@import "@webai/signal-token/tailwind";
+@import "@webai/signal-ui/styles";
+```
+
+Use `@webai/signal-ui/styles/full` only in non-Tailwind environments.
+
+### Theme
+
+Wrap the app root with `ThemeProvider` (skip if you're using `next-themes` or equivalent):
+
+```jsx
+import { ThemeProvider } from '@webai/signal-ui';
+
+<ThemeProvider>
+  <App />
+</ThemeProvider>
+```
+
+`useTheme()` → `{ theme, setTheme, resolvedTheme }`.
+
+### Component API
+
+Read the full API before writing UI:
+
+```bash
+cat node_modules/@webai/signal-ui/llms.txt
+```
+
+**Only use component names, props, and tokens documented in `llms.txt` — do not invent.** If Signal doesn't have the component you need, compose existing Signal components first. For headless patterns, prefer `@base-ui/react`. `shadcn/ui` is last resort only; do not add any other UI library.
+
+### Token-backed colors (never hardcode)
+
+- `bg-background` / `text-foreground` — surface and primary text
+- `bg-primary` / `text-primary-foreground` — brand
+- `bg-muted` / `text-muted-foreground` — secondary
+- `bg-card` / `text-card-foreground` — cards
+- `border-border` — borders
+- `bg-destructive` / `text-destructive-foreground` — errors
+
+### Rules
+
+1. Signal components first. Compose existing components before creating custom UI.
+2. Never rebuild a component Signal already provides.
+3. Tailwind for layout, spacing, typography, responsiveness. `@webai/signal-token` for color and radius.
+4. Token-backed colors only — never hardcode hex.
+5. Keep custom CSS minimal.
+6. Semantic HTML and accessible interactions.
+7. Mark unavoidable gaps with `/* SDS GAP: [description] */`.
+
+### Priority order
+
+1. `@webai/signal-ui` components
+2. Composed Signal components
+3. Tailwind + `@webai/signal-token`
+4. `@base-ui/react` for headless patterns
+5. Custom CSS (real gaps only)
+6. `shadcn/ui` (last resort, not recommended)
 
 ## Getting the selected model
 

@@ -59,19 +59,53 @@ npm install
 npm install --save-dev vite-plugin-singlefile
 ```
 
+### Signal Design System (React apps — default UI layer)
+
+Signal is the canonical UI toolkit for webAI apps. Use it for every React app unless the user explicitly opts out. It ships token-backed components that automatically match the Apogee shell's theme (light/dark).
+
+Add `.npmrc` to the app root (no auth needed, public package registry):
+
+```
+@webai:registry=https://gitlab.com/api/v4/projects/74115605/packages/npm/
+```
+
+Ensure React 19+ (Vite React templates ship with 19 as of 2025 — bump `react` and `react-dom` if the scaffold is on 18):
+
+```bash
+npm install react@^19 react-dom@^19
+```
+
+Install Signal + Tailwind v4:
+
+```bash
+npm install @webai/signal-ui @webai/signal-token
+npm install --save-dev tailwindcss @tailwindcss/vite
+```
+
+After install, read the canonical component API before writing any UI:
+
+```bash
+cat node_modules/@webai/signal-ui/llms.txt
+```
+
+Only use components, props, and tokens documented in that file. Do not invent names.
+
+**Vue apps:** Signal is React-only. For Vue, skip the Signal install and fall back to Tailwind v4 + `@webai/signal-token` (tokens work framework-agnostically via CSS custom properties).
+
 ---
 
 ## Step 3 — Patch `vite.config.js`
 
-Non-negotiable for Apogee compatibility:
+Non-negotiable for Apogee compatibility. Add Tailwind v4 plugin alongside `viteSingleFile`:
 
 ```javascript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react'; // or vue
+import tailwindcss from '@tailwindcss/vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig({
-  plugins: [react(), viteSingleFile()],
+  plugins: [react(), tailwindcss(), viteSingleFile()],
   build: {
     target: 'esnext',
     assetsInlineLimit: 100000000,
@@ -79,6 +113,8 @@ export default defineConfig({
   },
 });
 ```
+
+`viteSingleFile` will inline all Signal CSS and JS into the final `dist/index.html` — single-file output is preserved.
 
 ---
 
@@ -112,6 +148,7 @@ The Apogee shell parses this before injecting the SDK. Insert as the first `<scr
   "schemaVersion": 1,
   "name": "<Display Name>",
   "version": "1.0.0",
+  "minPlatformApiLevel": 1,
   "provides": { "hasOwnRouting": true },
   "requires": {
     "managers": ["shell", "intelligence"]
@@ -259,21 +296,46 @@ async function generate(prompt) {
 
 ### CSS approach
 
-Use CSS custom properties and support both themes via the `data-theme` attribute (Apogee sets this on `<html>`):
+**React apps — use Signal Design System tokens via Tailwind.** Create `src/index.css` (or append to the existing entry CSS):
 
 ```css
-:root {
-  --bg: #ffffff;
-  --surface: #f5f5f5;
-  --text: #111111;
-  --accent: #2563eb;
-  --radius: 8px;
-}
-[data-theme="dark"] {
-  --bg: #181818;
-  --surface: #262626;
-  --text: #fafafa;
-}
+@import "tailwindcss";
+@import "@webai/signal-token/tailwind";
+@import "@webai/signal-ui/styles";
+```
+
+Import it once at the app entry (`src/main.jsx`):
+
+```jsx
+import './index.css';
+```
+
+Use token-backed Tailwind classes for all color — **never hardcode hex values**:
+
+- `bg-background`, `text-foreground` — surface/text
+- `bg-primary`, `text-primary-foreground` — brand accent
+- `bg-muted`, `text-muted-foreground` — secondary surface/text
+- `border-border` — borders
+
+Wrap the app root with `ThemeProvider` so Signal's theme context is available:
+
+```jsx
+import { ThemeProvider } from '@webai/signal-ui';
+
+<ThemeProvider>
+  <App />
+</ThemeProvider>
+```
+
+Compose existing Signal components (`Button`, `Card`, `Input`, `Dialog`, etc.) before writing custom markup. Check `node_modules/@webai/signal-ui/llms.txt` for the full list. For headless patterns not in Signal, use `@base-ui/react`. Never introduce shadcn, MUI, or any other UI library.
+
+**Vue apps (or apps that opted out of Signal):** Use `@webai/signal-token` CSS tokens directly and support both themes via the `data-theme` attribute (Apogee sets this on `<html>`):
+
+```css
+@import "@webai/signal-token/css";
+
+:root { --radius: 8px; }
+/* token-backed values are already set by the import */
 ```
 
 ---
@@ -389,3 +451,7 @@ const user = sdk?.identity?.getState?.(); // { displayName, peerId, odid }
 - **Forgetting to declare managers**: If `"storage"` isn't listed in the manifest, `sdk.storage` won't be available at runtime even though `sdk` exists.
 - **Polling instead of subscribing**: Never call `getIntelligenceState()` on an interval. Use `onIntelligenceChange` to subscribe and update state reactively.
 - **Hardcoding app IDs**: Derive from `package.json` name.
+- **Inventing Signal components or props**: Only use what's documented in `node_modules/@webai/signal-ui/llms.txt`. Never guess component names or props.
+- **Hardcoded colors**: Use token classes (`bg-background`, `text-foreground`, `bg-primary`, `border-border`) — never `bg-[#1a1a1a]` or literal hex. Tokens auto-match the Apogee theme.
+- **Rebuilding what Signal provides**: If Signal has a `Button`, `Dialog`, `Input`, `Card`, etc., use it. Don't write a custom one.
+- **Mixing UI libraries**: Don't add shadcn, MUI, Chakra, Radix-standalone, etc. on top of Signal. If Signal is missing something, compose existing Signal components or use `@base-ui/react` for headless patterns. Mark unavoidable gaps with `/* SDS GAP: [description] */`.
